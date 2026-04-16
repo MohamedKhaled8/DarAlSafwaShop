@@ -114,7 +114,7 @@ const Navbar = () => {
     <>
       {/* Main Header - Clean White */}
       <motion.header
-        className={`fixed left-0 right-0 top-0 z-40 transition-all duration-500 ${
+        className={`fixed left-0 right-0 top-0 z-40 transition-all duration-500 overflow-visible ${
           isHome && !scrolled ? "bg-transparent" : "bg-white shadow-sm"
         }`}
         initial={{ y: -100 }}
@@ -122,7 +122,7 @@ const Navbar = () => {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.36, 1] }}
       >
         <div 
-          className={`transition-all duration-500 ${
+          className={`transition-all duration-500 overflow-visible ${
             isHome && !scrolled ? "bg-transparent border-transparent" : "bg-white border-b border-slate-100 shadow-sm"
           }`}
         >
@@ -236,7 +236,7 @@ const Navbar = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.97 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full mt-2 right-0 w-64 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[50]"
+                        className="absolute top-full mt-2 right-0 left-auto w-64 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-visible z-[9999]"
                       >
                       <div className="p-2">
                         {categories.filter(c => c?.id).length === 0 ? (
