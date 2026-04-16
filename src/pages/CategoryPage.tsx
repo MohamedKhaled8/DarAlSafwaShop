@@ -3,11 +3,11 @@ import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { SlidersHorizontal, X, Loader2 } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import { useProductsByCategory, useCategories, getCategoryDisplayName } from "@/hooks/useProducts";
+import { useProductsByCategory, useCategories } from "@/hooks/useProducts";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const CategoryPage = () => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { id } = useParams();
   const { products: catProducts, loading: productsLoading } = useProductsByCategory(id || "");
   const { categories, loading: categoriesLoading } = useCategories();
@@ -34,9 +34,7 @@ const CategoryPage = () => {
     <main className="pb-20 lg:pb-0">
       <div className="section-padding py-8">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-          <h1 className="text-2xl md:text-3xl font-bold mb-1">
-            {category ? getCategoryDisplayName(category, language) : (t("category.allProducts") as string)}
-          </h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-1">{category?.name || "All Products"}</h1>
           <p className="text-sm text-muted-foreground mb-6">{filtered.length} {(t("category.products") as string)}</p>
         </motion.div>
 
@@ -100,7 +98,7 @@ const CategoryPage = () => {
                         to={`/category/${pathId}`}
                         className={`block px-3 py-2 rounded-lg text-sm transition-colors ${active ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
                       >
-                        {getCategoryDisplayName(c, language)}
+                        {c.name}
                       </Link>
                     );
                   })}
@@ -117,9 +115,11 @@ const CategoryPage = () => {
               </div>
             ) : catProducts.length === 0 ? (
               <div className="text-center py-20">
-                <p className="text-lg font-medium mb-2">{t("category.emptyInCategory") as string}</p>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {(t("category.categoryIdLabel") as string)}: {id}
+                <p className="text-lg font-medium mb-2">لا توجد منتجات في هذه الفئة</p>
+                <p className="text-sm text-muted-foreground mb-4">Category ID: {id}</p>
+                <p className="text-xs text-muted-foreground">
+                  {catProducts.length} منتجات تم جلبها | 
+                  {filtered.length} بعد الفلترة
                 </p>
               </div>
             ) : filtered.length === 0 ? (

@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { useCategories, getCategoryDisplayName } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useProducts";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Footer = () => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { categories } = useCategories();
 
   return (
@@ -15,7 +15,7 @@ const Footer = () => {
             <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-xs">ص</span>
             </div>
-            <span className="font-bold">{t("app.name") as string}</span>
+            <span className="font-bold">دار الصفوة</span>
           </div>
           <p className="text-sm opacity-60 leading-relaxed">{t("app.description") as string}</p>
         </div>
@@ -23,7 +23,7 @@ const Footer = () => {
           <h4 className="font-semibold text-sm mb-3">{t("footer.quickLinks") as string}</h4>
           <ul className="space-y-2">
             {categories.filter(c => c?.id).slice(0, 5).map(c => (
-              <li key={c.id}><Link to={`/category/${c.slug || c.id}`} className="text-sm opacity-60 hover:opacity-100 transition-opacity">{getCategoryDisplayName(c, language)}</Link></li>
+              <li key={c.id}><Link to={`/category/${c.slug || c.id}`} className="text-sm opacity-60 hover:opacity-100 transition-opacity">{c.name}</Link></li>
             ))}
           </ul>
         </div>
@@ -44,7 +44,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="border-t border-primary-foreground/10 mt-10 pt-6 text-center">
-        <p className="text-xs opacity-40">© 2026 {t("app.name") as string}. {t("footer.rights") as string}</p>
+        <p className="text-xs opacity-40">© 2026 {t("app.name") as string}. All rights reserved.</p>
       </div>
     </div>
   </footer>

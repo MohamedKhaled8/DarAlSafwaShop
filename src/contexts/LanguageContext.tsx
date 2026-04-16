@@ -193,9 +193,6 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "category.minRating": "أقل تقييم",
     "category.allRatings": "كل التقييمات",
     "category.noMatchesFilters": "لا توجد منتجات ضمن الفلاتر الحالية",
-    "category.allProducts": "جميع المنتجات",
-    "category.emptyInCategory": "لا توجد منتجات في هذه الفئة بعد.",
-    "category.categoryIdLabel": "معرّف القسم",
     
     // Dashboard
     "dashboard.loginRequired": "يرجى تسجيل الدخول",
@@ -718,9 +715,6 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "category.minRating": "Minimum rating",
     "category.allRatings": "All ratings",
     "category.noMatchesFilters": "No products match the current filters",
-    "category.allProducts": "All products",
-    "category.emptyInCategory": "There are no products in this category yet.",
-    "category.categoryIdLabel": "Category ID",
     
     // Dashboard
     "dashboard.loginRequired": "Please Login",
