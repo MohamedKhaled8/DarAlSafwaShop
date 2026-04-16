@@ -81,7 +81,8 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     
     // Categories & Products
     "category.viewAll": "عرض الكل",
-    "category.products": "منتج",
+    "category.products": "منتجات",
+    "category.browseNow": "تصفح الآن",
     "product.addToCart": "أضف للسلة",
     "product.outOfStock": "نفذت الكمية",
     "product.off": "خصم",
@@ -602,6 +603,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     // Categories & Products
     "category.viewAll": "View All",
     "category.products": "products",
+    "category.browseNow": "Browse Now",
     "product.addToCart": "Add to Cart",
     "product.outOfStock": "Out of Stock",
     "product.off": "OFF",

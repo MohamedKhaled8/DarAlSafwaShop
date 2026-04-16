@@ -103,7 +103,7 @@ const DarAlSafwaHero = () => {
               {/* Input Field */}
               <input 
                 type="text"
-                placeholder="ابحث عن العناوين، الأدوات، أو الهدايا..."
+                placeholder={t("nav.searchPlaceholder") as string}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="w-full bg-transparent px-8 py-5 md:py-6 text-xl md:text-2xl font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none text-right"
@@ -208,7 +208,7 @@ const HomePage = () => {
                   <span className="text-sm font-bold text-gray-800 group-hover:text-indigo-600 whitespace-nowrap transition-colors block">
                     {c.name}
                   </span>
-                  <span className="text-[10px] font-semibold text-gray-400">تصفح الآن</span>
+                  <span className="text-[10px] font-semibold text-gray-400">{t("category.browseNow") as string}</span>
                 </div>
               </Link>
             </motion.div>
