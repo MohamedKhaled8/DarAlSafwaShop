@@ -241,7 +241,7 @@ const Navbar = () => {
                     >
                       <div className="p-2">
                         {categories.filter(c => c?.id).length === 0 ? (
-                          <p className="text-sm text-slate-400 text-center py-4">لا توجد أقسام بعد</p>
+                          <p className="text-sm text-slate-400 text-center py-4">{t("nav.noCategories") as string}</p>
                         ) : (
                           categories.filter(c => c?.id).map((cat) => {
                             const Icon = iconMap[cat.icon] || BookOpen;
@@ -293,7 +293,7 @@ const Navbar = () => {
                 >
                   <span className={`font-black text-xl transition-colors hidden md:block ${
                     isHome && !scrolled ? "text-white" : "text-slate-800"
-                  }`}>دار الصفوة</span>
+                  }`}>{t("app.name") as string}</span>
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-all ${
                     isHome && !scrolled ? "bg-white/10 backdrop-blur-md" : "bg-emerald-600 shadow-xl"
                   }`}>

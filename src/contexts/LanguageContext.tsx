@@ -35,6 +35,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "nav.signOut": "تسجيل الخروج",
     "nav.admin": "لوحة تحكم الأدمن",
     "nav.myOrdersStatus": "حالة طلباتي",
+    "nav.noCategories": "لا توجد أقسام بعد",
     
     // Top bar
     "top.printing": "خدمات الطباعة",
@@ -553,6 +554,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "nav.signOut": "Sign Out",
     "nav.admin": "Admin Dashboard",
     "nav.myOrdersStatus": "My Orders Status",
+    "nav.noCategories": "No categories yet",
     
     // Top bar
     "top.printing": "Printing Services",
