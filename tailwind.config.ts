@@ -15,6 +15,8 @@ export default {
     extend: {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+        body: ["Inter", "system-ui", "sans-serif"],
+        headline: ["Manrope", "Inter", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -59,6 +61,18 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+        },
+        /** Stitch / Ethereal Books design tokens (homepage) */
+        vibe: {
+          primary: "#4647d3",
+          "on-primary": "#f4f1ff",
+          surface: "#f5f7f9",
+          "on-surface": "#2c2f31",
+          "on-surface-variant": "#595c5e",
+          "surface-container": "#e5e9eb",
+          "surface-container-low": "#eef1f3",
+          "surface-container-lowest": "#ffffff",
+          error: "#b41340",
         },
       },
       borderRadius: {

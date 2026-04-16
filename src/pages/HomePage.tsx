@@ -1,265 +1,330 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowRight, Star, ChevronLeft, ChevronRight, Mail, Truck, Shield, RefreshCw } from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  ShoppingCart, Star, ChevronLeft, ChevronRight,
+  ArrowRight, ArrowUp, Zap, TrendingUp, Package,
+  Search, ChevronDown,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useCartContext } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { seedProducts, seedCategories } from "@/data/seedData";
+import type { Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
-import { categories, products, testimonials, brands, bannerSlides } from "@/data/products";
+import { useProducts, useCategories } from "@/hooks/useProducts";
 
-const fadeUp = {
-  initial: { opacity: 0, y: 16, filter: "blur(4px)" },
-  whileInView: { opacity: 1, y: 0, filter: "blur(0px)" },
-  viewport: { once: true, amount: 0.2 },
-  transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-};
+const HERO_SLIDES = [
+  {
+    tag: "عرض لفترة محدودة",
+    title: "مجموعة العودة <br/> للمدارس 2024",
+    subtitle: "كل ما يحتاجه طفلك في مكان واحد بخصومات تصل لـ 50%",
+    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
+    bg: "bg-[#fde047]", // Noon Yellow
+    text: "text-slate-900",
+    btnColor: "bg-slate-900 text-white"
+  },
+  {
+    tag: "إصدارات جديدة",
+    title: "ركن القراءة <br/> المميز بالدار",
+    subtitle: "أحدث الروايات والكتب العلمية بأفضل الأسعار حصرياً",
+    image: "https://images.unsplash.com/photo-1524578271613-d550eebad474?w=800&q=80",
+    bg: "bg-[#4338ca]", // Indigo
+    text: "text-white",
+    btnColor: "bg-white text-indigo-600"
+  }
+];
 
-const CountdownTimer = () => {
-  const [time, setTime] = useState({ h: 5, m: 42, s: 18 });
-  useEffect(() => {
-    const t = setInterval(() => {
-      setTime(prev => {
-        let { h, m, s } = prev;
-        s--;
-        if (s < 0) { s = 59; m--; }
-        if (m < 0) { m = 59; h--; }
-        if (h < 0) { h = 23; m = 59; s = 59; }
-        return { h, m, s };
-      });
-    }, 1000);
-    return () => clearInterval(t);
-  }, []);
+// No static fallbacks. The store only relies on real database data.
+
+/* ═══════ MARKETPLACE HERO ═══════ */
+const DarAlSafwaHero = () => {
+  const { t } = useLanguage();
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) navigate(`/search?q=${query}`);
+  };
+
   return (
-    <div className="flex gap-2">
-      {[
-        { v: time.h, l: "HRS" },
-        { v: time.m, l: "MIN" },
-        { v: time.s, l: "SEC" },
-      ].map(({ v, l }) => (
-        <div key={l} className="flex flex-col items-center">
-          <span className="bg-foreground text-primary-foreground w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold tabular-nums animate-count-pulse">
-            {String(v).padStart(2, "0")}
-          </span>
-          <span className="text-[10px] text-muted-foreground mt-1 font-medium">{l}</span>
+    <div className="relative w-full pb-20 -mt-20">
+      {/* ═══ MINIMALIST HIGH-END HERO ═══ */}
+      <div className="w-full h-[550px] md:h-[650px] relative">
+        <div className="absolute inset-0 rounded-b-lg md:rounded-b-[20px] overflow-hidden shadow-lg bg-slate-900">
+          {/* Background Image */}
+          <div className="absolute inset-0 z-0">
+            <motion.img 
+              initial={{ scale: 1.05 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 12 }}
+              src="https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1920&q=80" 
+              alt="Dar Al Safwa" 
+              className="w-full h-full object-cover brightness-50" 
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544640808-32ca72ac7f37?w=1920&q=80';
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-at-t from-slate-900/80 via-transparent to-slate-900/20"></div>
+          </div>
+
+          {/* Hero Content */}
+          <div className="relative z-10 w-full h-full flex flex-col items-center justify-center text-center px-6 pt-20">
+            <motion.div
+               initial={{ opacity: 0, y: 30 }}
+               animate={{ opacity: 1, y: 0 }}
+               transition={{ duration: 0.8 }}
+            >
+              <h1 className="text-5xl md:text-8xl font-black text-white mb-6 drop-shadow-2xl">
+                دار الصفوة
+              </h1>
+              <p className="text-xl md:text-3xl font-medium text-white/90 max-w-3xl mx-auto drop-shadow-md leading-relaxed">
+                وجهتكم المتكاملة للمستلزمات المكتبية، الكتب، والهدايا الاستثنائية
+              </p>
+            </motion.div>
+          </div>
         </div>
-      ))}
+
+        {/* ═══ FLOATING SEARCH BAR ═══ */}
+        <div className="absolute -bottom-8 left-0 right-0 z-30 px-6">
+          <form 
+            onSubmit={handleSearch}
+            className="max-w-4xl mx-auto"
+          >
+            <div className="flex flex-row-reverse items-center bg-white rounded-2xl md:rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.15)] border-[4px] border-white overflow-hidden transition-all duration-300">
+              {/* Search Button */}
+              <button 
+                type="submit"
+                className="bg-slate-900 hover:bg-violet-600 text-white p-5 md:p-6 transition-all"
+              >
+                <Search className="w-7 h-7 md:w-9 md:h-9" />
+              </button>
+
+              {/* Input Field */}
+              <input 
+                type="text"
+                placeholder="ابحث عن العناوين، الأدوات، أو الهدايا..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full bg-transparent px-8 py-5 md:py-6 text-xl md:text-2xl font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none text-right"
+              />
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════ HORIZONTAL SCROLL ═══════ */
+const HScroll = ({ children }: { children: React.ReactNode }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const scroll = (d: number) => ref.current?.scrollBy({ left: d * 320, behavior: "smooth" });
+
+  return (
+    <div className="relative group/hscroll">
+      <button
+        onClick={() => scroll(-1)}
+        className="absolute -start-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-2xl flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border border-gray-100 dark:border-gray-700 opacity-0 group-hover/hscroll:opacity-100 -translate-x-2 group-hover/hscroll:translate-x-0"
+      >
+        <ChevronLeft className="w-5 h-5 text-gray-800 dark:text-gray-200" />
+      </button>
+      <button
+        onClick={() => scroll(1)}
+        className="absolute -end-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white dark:bg-gray-800 shadow-2xl flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-all border border-gray-100 dark:border-gray-700 opacity-0 group-hover/hscroll:opacity-100 translate-x-2 group-hover/hscroll:translate-x-0"
+      >
+        <ChevronRight className="w-5 h-5 text-gray-800 dark:text-gray-200" />
+      </button>
+      <div ref={ref} className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth py-6 px-4 -mx-4">
+        {children}
+      </div>
     </div>
   );
 };
 
+/* ═══════════════════════════════════════════
+   MAIN HOME PAGE
+   ═══════════════════════════════════════════ */
 const HomePage = () => {
-  const [slide, setSlide] = useState(0);
-  const [testimonialIdx, setTestimonialIdx] = useState(0);
-  const bestSellers = products.filter(p => p.badge === "Best Seller" || p.badge === "Top Rated" || p.rating >= 4.6);
-  const deals = products.filter(p => p.originalPrice);
+  const { t } = useLanguage();
 
-  useEffect(() => {
-    const t = setInterval(() => setSlide(s => (s + 1) % bannerSlides.length), 4000);
-    return () => clearInterval(t);
-  }, []);
+  const { products: allProducts, loading: productsLoading } = useProducts();
+  const { categories: fetchedCategories, loading: categoriesLoading } = useCategories();
+
+  const deals = useMemo(() => {
+    return allProducts.filter(p => {
+      if (p.isFlashSale) return true;
+      return p.originalPrice && p.originalPrice > p.price;
+    }).slice(0, 10);
+  }, [allProducts]);
+
+  const bestSellers = useMemo(() => allProducts.filter(p => p.badge === "Best Seller" || p.rating >= 4.8).slice(0, 8), [allProducts]);
+  const categories = useMemo(() => fetchedCategories.filter(c => c?.id), [fetchedCategories]);
+
+  const catEmoji: Record<string, string> = {
+    books: "📚", educational: "🎓", electronics: "💻", toys: "🎮",
+    gifts: "🎁", art: "🎨", office: "✏️", digital: "📱",
+  };
+
+  const [showAll, setShowAll] = useState(false);
+  const visibleProducts = showAll ? allProducts : allProducts.slice(0, 12);
 
   return (
-    <main className="pb-20 lg:pb-0">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-hero-gradient text-primary-foreground">
-        <div className="section-padding py-16 md:py-24 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="max-w-2xl"
-          >
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight mb-4">
-              Your All-in-One Educational Store
-            </h1>
-            <p className="text-base sm:text-lg opacity-80 mb-8 max-w-lg leading-relaxed">
-              Books, electronics, art supplies, and everything you need — all in one place at unbeatable prices.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link to="/category/books" className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-foreground text-primary font-semibold text-sm hover:bg-primary-foreground/90 transition-colors btn-press">
-                Shop Now <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link to="/category/electronics" className="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 border-primary-foreground/30 text-primary-foreground font-semibold text-sm hover:bg-primary-foreground/10 transition-colors btn-press">
-                Explore
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-        <div className="absolute top-0 right-0 w-1/2 h-full opacity-10">
-          <div className="absolute inset-0 bg-gradient-to-l from-transparent to-primary" />
-        </div>
+    <main className="bg-[#fcfdfe] min-h-screen pb-20 lg:pb-0">
+
+      {/* ═══ DAR AL SAFWA HERO (Immersive Splash) ═══ */}
+      <section className="w-full relative -mt-20">
+        <DarAlSafwaHero />
       </section>
 
-      {/* Banner slider */}
-      <section className="section-padding -mt-6 relative z-10">
-        <div className="rounded-2xl overflow-hidden shadow-lg">
-          <div className={`${bannerSlides[slide].bg} text-primary-foreground p-8 md:p-12 transition-all duration-500`}>
-            <motion.div key={slide} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.4 }}>
-              <p className="text-xs font-semibold uppercase tracking-widest opacity-70 mb-2">Limited Time</p>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2">{bannerSlides[slide].title}</h2>
-              <p className="opacity-80">{bannerSlides[slide].subtitle}</p>
-            </motion.div>
-            <div className="flex gap-2 mt-4">
-              {bannerSlides.map((_, i) => (
-                <button key={i} onClick={() => setSlide(i)} className={`w-2 h-2 rounded-full transition-all ${i === slide ? "bg-primary-foreground w-6" : "bg-primary-foreground/40"}`} />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust badges */}
-      <motion.section {...fadeUp} className="section-padding mt-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { icon: Truck, label: "Free Shipping", sub: "On orders over $50" },
-            { icon: Shield, label: "Secure Payment", sub: "100% protected" },
-            { icon: RefreshCw, label: "Easy Returns", sub: "30-day policy" },
-            { icon: Star, label: "Top Quality", sub: "Verified products" },
-          ].map(({ icon: Icon, label, sub }) => (
-            <div key={label} className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border">
-              <div className="p-2.5 rounded-lg bg-primary/10">
-                <Icon className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">{label}</p>
-                <p className="text-xs text-muted-foreground">{sub}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.section>
-
-      {/* Categories */}
-      <motion.section {...fadeUp} className="section-padding mt-14">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl md:text-2xl font-bold">Shop by Category</h2>
-          <Link to="/category/books" className="text-sm text-primary font-medium hover:underline">View All</Link>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {categories.map((cat, i) => (
+      {/* ═══ CATEGORIES ═══ */}
+      <section className="section-padding py-10 overflow-hidden">
+        <motion.div 
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={{
+            visible: { transition: { staggerChildren: 0.05 } },
+            hidden: {}
+          }}
+          className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-1"
+        >
+          {categories.map((c, i) => (
             <motion.div
-              key={cat.id}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.06, duration: 0.5 }}
+              key={c.id}
+              variants={{
+                hidden: { opacity: 0, x: 20 },
+                visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 200, damping: 20 } }
+              }}
             >
               <Link
-                to={`/category/${cat.id}`}
-                className="group relative block aspect-[4/3] rounded-xl overflow-hidden"
+                to={`/category/${c.slug || c.id}`}
+                className="flex items-center gap-3 min-w-[160px] px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_24px_rgba(67,56,202,0.08)] hover:-translate-y-1 transition-all duration-500 group"
               >
-                <img src={cat.image} alt={cat.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-4">
-                  <p className="text-primary-foreground font-semibold text-sm">{cat.name}</p>
-                  <p className="text-primary-foreground/70 text-xs">{cat.count} items</p>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 bg-gray-50 group-hover:bg-indigo-50 transition-colors duration-500">
+                  {catEmoji[c.id] || "📦"}
+                </div>
+                <div>
+                  <span className="text-sm font-bold text-gray-800 group-hover:text-indigo-600 whitespace-nowrap transition-colors block">
+                    {c.name}
+                  </span>
+                  <span className="text-[10px] font-semibold text-gray-400">تصفح الآن</span>
                 </div>
               </Link>
             </motion.div>
           ))}
-        </div>
-      </motion.section>
+        </motion.div>
+      </section>
 
-      {/* Best Sellers */}
-      <motion.section {...fadeUp} className="section-padding mt-14">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl md:text-2xl font-bold">Best Sellers</h2>
-        </div>
-        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4">
-          {bestSellers.map((p, i) => (
-            <div key={p.id} className="min-w-[240px] max-w-[240px]">
-              <ProductCard product={p} index={i} />
-            </div>
-          ))}
-        </div>
-      </motion.section>
+      {/* ═══ FLASH DEALS ═══ */}
+      {deals.length > 0 && (
+        <section className="section-padding py-12 relative overflow-hidden">
+          {/* Section Background Subtle Glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[80%] bg-indigo-500/5 blur-[120px] pointer-events-none"></div>
 
-      {/* Deals with Countdown */}
-      <motion.section {...fadeUp} className="section-padding mt-14">
-        <div className="bg-accent/10 rounded-2xl p-6 md:p-10">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <div>
-              <h2 className="text-xl md:text-2xl font-bold">Flash Deals</h2>
-              <p className="text-sm text-muted-foreground">Hurry! These deals end soon</p>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+            <div className="flex items-center gap-4">
+               <div className="relative">
+                  <div className="w-14 h-14 rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200 flex items-center justify-center rotate-3 group-hover:rotate-0 transition-transform">
+                    <Zap className="w-7 h-7 text-white" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 border-2 border-white rounded-full animate-pulse"></div>
+               </div>
+               <div>
+                  <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-none mb-1">
+                    {t("home.flash.title") as string}
+                  </h2>
+                  <p className="text-sm font-medium text-gray-400">عروض مختارة بعناية اليوم</p>
+               </div>
             </div>
-            <CountdownTimer />
+            <Link to="/search?q=flash" className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 flex items-center gap-2 group transition-all">
+              <span className="border-b-2 border-transparent group-hover:border-indigo-600 pb-0.5">مشاهدة الكل</span>
+              <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
+            </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+          <HScroll>
             {deals.map((p, i) => (
-              <ProductCard key={p.id} product={p} index={i} />
+              <div key={p.id} className="min-w-[240px] max-w-[280px] shrink-0">
+                <ProductCard product={p} index={i} />
+              </div>
             ))}
-          </div>
-        </div>
-      </motion.section>
+          </HScroll>
+        </section>
+      )}
 
-      {/* Recommended */}
-      <motion.section {...fadeUp} className="section-padding mt-14">
-        <h2 className="text-xl md:text-2xl font-bold mb-1">Recommended For You</h2>
-        <p className="text-sm text-muted-foreground mb-6">Based on trending products</p>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products.slice(0, 8).map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} />
+      {/* ═══ BEST SELLERS ═══ */}
+      <section className="section-padding mt-10">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-white" />
+            </div>
+            <h2 className="text-lg md:text-xl font-extrabold text-gray-900">{t("home.bestselling.title") as string}</h2>
+          </div>
+          <Link to="/category/books" className="text-xs font-semibold text-indigo-600 hover:underline flex items-center gap-1">
+            {t("category.viewAll") as string} <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {bestSellers.map(p => (
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
-      </motion.section>
+      </section>
 
-      {/* Testimonials */}
-      <motion.section {...fadeUp} className="section-padding mt-14">
-        <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">What Our Customers Say</h2>
-        <div className="relative max-w-xl mx-auto">
-          <motion.div
-            key={testimonialIdx}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="bg-card rounded-2xl p-8 border border-border text-center"
-          >
-            <div className="flex justify-center gap-1 mb-4">
-              {Array.from({ length: testimonials[testimonialIdx].rating }).map((_, i) => (
-                <Star key={i} className="w-4 h-4 text-accent fill-accent" />
-              ))}
+      {/* ═══ ALL PRODUCTS ═══ */}
+      <section className="section-padding mt-10">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+              <Package className="w-4 h-4 text-white" />
             </div>
-            <p className="text-sm leading-relaxed mb-4 italic">"{testimonials[testimonialIdx].text}"</p>
-            <p className="font-semibold text-sm">{testimonials[testimonialIdx].name}</p>
-            <p className="text-xs text-muted-foreground">{testimonials[testimonialIdx].role}</p>
-          </motion.div>
-          <div className="flex justify-center gap-3 mt-4">
-            <button onClick={() => setTestimonialIdx(i => (i - 1 + testimonials.length) % testimonials.length)} className="p-2 rounded-full bg-secondary hover:bg-muted transition-colors btn-press">
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button onClick={() => setTestimonialIdx(i => (i + 1) % testimonials.length)} className="p-2 rounded-full bg-secondary hover:bg-muted transition-colors btn-press">
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            <h2 className="text-lg md:text-xl font-extrabold text-gray-900">{t("home.cta.shopSale") as string}</h2>
           </div>
         </div>
-      </motion.section>
 
-      {/* Brands */}
-      <motion.section {...fadeUp} className="section-padding mt-14 overflow-hidden">
-        <h2 className="text-xl md:text-2xl font-bold mb-6 text-center">Trusted Brands</h2>
-        <div className="relative">
-          <div className="flex animate-slide-left whitespace-nowrap">
-            {[...brands, ...brands].map((b, i) => (
-              <span key={i} className="inline-block px-8 py-3 text-muted-foreground font-semibold text-sm">{b}</span>
-            ))}
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {visibleProducts.map(p => (
+            <ProductCard key={p.id} product={p} />
+          ))}
         </div>
-      </motion.section>
 
-      {/* Newsletter */}
-      <motion.section {...fadeUp} className="section-padding mt-14">
-        <div className="bg-hero-gradient rounded-2xl p-8 md:p-12 text-primary-foreground text-center">
-          <Mail className="w-8 h-8 mx-auto mb-3 opacity-80" />
-          <h2 className="text-xl md:text-2xl font-bold mb-2">Stay Updated</h2>
-          <p className="opacity-80 text-sm mb-6 max-w-md mx-auto">Get the latest deals, new arrivals, and exclusive offers delivered to your inbox.</p>
-          <div className="flex max-w-md mx-auto gap-2">
-            <input type="email" placeholder="Your email address" className="flex-1 px-4 py-3 rounded-full text-sm text-foreground bg-primary-foreground focus:outline-none focus:ring-2 focus:ring-primary-foreground/50" />
-            <button className="px-6 py-3 rounded-full bg-accent text-accent-foreground font-semibold text-sm hover:bg-accent/90 transition-colors btn-press">
-              Subscribe
+        {!showAll && allProducts.length > 12 && (
+          <div className="text-center mt-8">
+            <button
+              onClick={() => setShowAll(true)}
+              className="px-8 py-3 rounded-full border-2 border-gray-200 text-gray-700 text-sm font-bold hover:border-indigo-600 hover:text-indigo-600 transition-colors"
+            >
+              {t("category.viewAll") as string} ({allProducts.length - 12}+)
             </button>
           </div>
-        </div>
-      </motion.section>
+        )}
+      </section>
+
+      {/* ═══ SCROLL TO TOP ═══ */}
+      <ScrollToTopBtn />
     </main>
+  );
+};
+
+/* ═══════ SCROLL TO TOP ═══════ */
+const ScrollToTopBtn = () => {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const fn = () => setShow(window.scrollY > 400);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="fixed bottom-24 lg:bottom-8 end-6 w-11 h-11 rounded-full bg-gray-900 text-white flex items-center justify-center shadow-xl transition-all duration-300 z-40 hover:bg-indigo-600"
+      style={{ opacity: show ? 1 : 0, transform: show ? "scale(1)" : "scale(0.6)", pointerEvents: show ? "auto" : "none" }}
+    >
+      <ArrowUp className="w-5 h-5" />
+    </button>
   );
 };
 

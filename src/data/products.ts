@@ -4,6 +4,7 @@ export interface Product {
   price: number;
   originalPrice?: number;
   image: string;
+  images?: string[];
   category: string;
   rating: number;
   reviews: number;
@@ -11,6 +12,7 @@ export interface Product {
   description: string;
   specs: Record<string, string>;
   inStock: boolean;
+  isFlashSale?: boolean;
 }
 
 export interface Category {
@@ -19,17 +21,18 @@ export interface Category {
   icon: string;
   image: string;
   count: number;
+  slug: string;
 }
 
 export const categories: Category[] = [
-  { id: "books", name: "Books", icon: "BookOpen", image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80", count: 342 },
-  { id: "educational", name: "Educational Materials", icon: "GraduationCap", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80", count: 128 },
-  { id: "electronics", name: "Electronics", icon: "Laptop", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&q=80", count: 256 },
-  { id: "toys", name: "Toys & Games", icon: "Gamepad2", image: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400&q=80", count: 189 },
-  { id: "gifts", name: "Gifts", icon: "Gift", image: "https://images.unsplash.com/photo-1549465220-1a8b9238f760?w=400&q=80", count: 94 },
-  { id: "art", name: "Art Supplies", icon: "Palette", image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&q=80", count: 167 },
-  { id: "office", name: "Office Supplies", icon: "PenTool", image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&q=80", count: 213 },
-  { id: "digital", name: "Digital Products", icon: "Download", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80", count: 76 },
+  { id: "books", slug: "books", name: "كتب", icon: "BookOpen", image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&q=80", count: 342 },
+  { id: "educational", slug: "educational", name: "مواد تعليمية", icon: "GraduationCap", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=80", count: 128 },
+  { id: "electronics", slug: "electronics", name: "إلكترونيات", icon: "Laptop", image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?w=400&q=80", count: 256 },
+  { id: "toys", slug: "toys", name: "ألعاب", icon: "Gamepad2", image: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?w=400&q=80", count: 189 },
+  { id: "gifts", slug: "gifts", name: "هدايا", icon: "Gift", image: "https://images.unsplash.com/photo-1549465220-1a8b9238f760?w=400&q=80", count: 94 },
+  { id: "art", slug: "art", name: "أدوات فنية", icon: "Palette", image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&q=80", count: 167 },
+  { id: "office", slug: "office", name: "أدوات مكتبية", icon: "PenTool", image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400&q=80", count: 213 },
+  { id: "digital", slug: "digital", name: "منتجات رقمية", icon: "Download", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80", count: 76 },
 ];
 
 export const products: Product[] = [
@@ -107,7 +110,7 @@ export const brands = [
 ];
 
 export const bannerSlides = [
-  { id: 1, title: "Back to School Sale", subtitle: "Up to 40% off textbooks & supplies", bg: "bg-hero-gradient" },
-  { id: 2, title: "New Electronics Arrivals", subtitle: "Latest tablets & accessories", bg: "bg-accent-gradient" },
-  { id: 3, title: "Art Supplies Week", subtitle: "Free brush set with orders over $50", bg: "bg-hero-gradient" },
+  { id: 1, title: "Back to School Sale", subtitle: "Up to 40% off textbooks & supplies", tag: "Limited Time", image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&q=80", link: "/category/books" },
+  { id: 2, title: "New Electronics Arrivals", subtitle: "Latest tablets & accessories", tag: "New Arrivals", image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&q=80", link: "/category/electronics" },
+  { id: 3, title: "Art Supplies Week", subtitle: "Free brush set with orders over $50", tag: "Special Offer", image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&q=80", link: "/category/art" },
 ];

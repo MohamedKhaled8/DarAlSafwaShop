@@ -2,15 +2,28 @@ import { Link, useLocation } from "react-router-dom";
 import { Home, Grid3X3, ShoppingCart, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCartContext } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useCategories } from "@/hooks/useProducts";
 
 const MobileNav = () => {
   const { pathname } = useLocation();
   const { cartCount } = useCartContext();
-  const links = [
-    { to: "/", icon: Home, label: "Home" },
-    { to: "/category/books", icon: Grid3X3, label: "Browse" },
-    { to: "/cart", icon: ShoppingCart, label: "Cart", badge: cartCount },
-    { to: "/dashboard", icon: User, label: "Account" },
+  const { t } = useLanguage();
+  const { categories } = useCategories();
+  const firstCat = categories.find(c => c?.id);
+  const categoryPath = firstCat ? `/category/${firstCat.slug || firstCat.id}` : "/";
+
+  const links: Array<{
+    to: string;
+    icon: typeof Home;
+    label: string;
+    badge?: number;
+    categoryTab?: boolean;
+  }> = [
+    { to: "/", icon: Home, label: t("nav.home") as string },
+    { to: categoryPath, icon: Grid3X3, label: t("nav.categories") as string, categoryTab: true },
+    { to: "/cart", icon: ShoppingCart, label: t("nav.cart") as string, badge: cartCount },
+    { to: "/dashboard", icon: User, label: t("nav.account") as string },
   ];
 
   return (
@@ -18,9 +31,12 @@ const MobileNav = () => {
       <div className="mx-3 mb-2 bg-card/80 backdrop-blur-xl rounded-2xl border border-border/40 shadow-[0_-4px_30px_rgba(0,0,0,0.06)]">
         <div className="flex items-center justify-around h-16">
           {links.map(l => {
-            const active = pathname === l.to;
+            const active =
+              "categoryTab" in l && l.categoryTab
+                ? pathname.startsWith("/category")
+                : pathname === l.to;
             return (
-              <Link key={l.to} to={l.to} className="flex flex-col items-center gap-1 relative px-4 py-1">
+              <Link key={l.label + l.to} to={l.to} className="flex flex-col items-center gap-1 relative px-4 py-1">
                 <motion.div
                   whileTap={{ scale: 0.85 }}
                   className={`p-1.5 rounded-xl transition-colors duration-300 ${active ? "bg-primary/10" : ""}`}

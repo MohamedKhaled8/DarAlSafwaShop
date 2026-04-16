@@ -6,6 +6,7 @@ export interface CartItem {
   price: number;
   image: string;
   quantity: number;
+  variantId?: string;
 }
 
 const CART_KEY = "edustore-cart";
@@ -27,7 +28,7 @@ export function useCart() {
   useEffect(() => { localStorage.setItem(CART_KEY, JSON.stringify(items)); }, [items]);
   useEffect(() => { localStorage.setItem(WISHLIST_KEY, JSON.stringify(wishlist)); }, [wishlist]);
 
-  const addToCart = useCallback((product: { id: string; name: string; price: number; image: string }) => {
+  const addToCart = useCallback((product: { id: string; name: string; price: number; image: string; variantId?: string }) => {
     setItems(prev => {
       const exists = prev.find(i => i.id === product.id);
       if (exists) return prev.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);

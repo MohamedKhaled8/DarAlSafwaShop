@@ -1,12 +1,11 @@
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Star, ShoppingCart, Heart, ChevronRight, Minus, Plus } from "lucide-react";
+import { Star, ShoppingCart, Heart, ChevronRight, Minus, Plus, Loader2 } from "lucide-react";
 import { useCartContext } from "@/contexts/CartContext";
-import { products } from "@/data/products";
+import { useProduct, useProductsByCategory } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
-
-const tabs = ["Description", "Reviews", "Specifications"] as const;
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const fakeReviews = [
   { name: "Emily R.", date: "2 weeks ago", rating: 5, text: "Excellent quality! Exactly what I was looking for. Fast shipping too." },
@@ -16,23 +15,42 @@ const fakeReviews = [
 
 const ProductPage = () => {
   const { id } = useParams();
-  const product = products.find(p => p.id === id);
+  const { t } = useLanguage();
+  const { product, loading } = useProduct(id || "");
+  const { products: relatedProducts, loading: relatedLoading } = useProductsByCategory(product?.category || "");
   const { addToCart, wishlist, toggleWishlist } = useCartContext();
-  const [activeTab, setActiveTab] = useState<typeof tabs[number]>("Description");
+  const [activeTab, setActiveTab] = useState<string>("Description");
   const [qty, setQty] = useState(1);
   const [imageIdx, setImageIdx] = useState(0);
 
+  const tabs = [
+    t("product.description") as string || "Description",
+    t("product.reviews") as string || "Reviews", 
+    t("product.specifications") as string || "Specifications"
+  ];
+
+  // Scroll to top when product ID changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [id]);
+
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
+
   if (!product) return (
     <div className="section-padding py-20 text-center">
-      <p className="text-lg font-medium">Product not found</p>
-      <Link to="/" className="text-sm text-primary mt-2 inline-block hover:underline">Go back home</Link>
+      <p className="text-lg font-medium">{(t("product.notFound") as string) || "Product not found"}</p>
+      <Link to="/" className="text-sm text-primary mt-2 inline-block hover:underline">{(t("nav.home") as string)}</Link>
     </div>
   );
 
   const isWished = wishlist.includes(product.id);
-  const related = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
-  // Simulate multiple images with slight variations
-  const images = [product.image, product.image, product.image];
+  const related = relatedProducts.filter(p => p.id !== product.id).slice(0, 4);
+  // Use real images array from product, fallback to single image
+  const images = (product.images && product.images.length > 0) ? product.images : [product.image];
   const discount = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
 
   return (
@@ -40,7 +58,7 @@ const ProductPage = () => {
       <div className="section-padding py-4">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-6">
-          <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
+          <Link to="/" className="hover:text-foreground transition-colors">{(t("nav.home") as string)}</Link>
           <ChevronRight className="w-3 h-3" />
           <Link to={`/category/${product.category}`} className="hover:text-foreground transition-colors capitalize">{product.category}</Link>
           <ChevronRight className="w-3 h-3" />
@@ -82,7 +100,7 @@ const ProductPage = () => {
               <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 ${
                 product.badge === "Deal" ? "bg-accent/20 text-accent-foreground" : "bg-primary/10 text-primary"
               }`}>
-                {product.badge}
+                {product.badge === "Deal" ? (t("product.off") as string) : product.badge}
               </span>
             )}
             <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-3">{product.name}</h1>
@@ -93,14 +111,14 @@ const ProductPage = () => {
                 ))}
               </div>
               <span className="text-sm font-medium">{product.rating}</span>
-              <span className="text-sm text-muted-foreground">({product.reviews} reviews)</span>
+              <span className="text-sm text-muted-foreground">({product.reviews} {(t("product.reviews") as string) || "reviews"})</span>
             </div>
 
             <div className="flex items-baseline gap-3 mb-6">
-              <span className="text-3xl font-bold">${product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold">{product.price.toFixed(2)} {(t("currency") as string)}</span>
               {product.originalPrice && (
                 <>
-                  <span className="text-lg text-muted-foreground line-through">${product.originalPrice.toFixed(2)}</span>
+                  <span className="text-lg text-muted-foreground line-through">{product.originalPrice.toFixed(2)} {(t("currency") as string)}</span>
                   <span className="text-sm font-semibold text-primary">-{discount}%</span>
                 </>
               )}
@@ -125,7 +143,7 @@ const ProductPage = () => {
                 onClick={() => { for (let i = 0; i < qty; i++) addToCart({ id: product.id, name: product.name, price: product.price, image: product.image }); }}
                 className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors btn-press"
               >
-                <ShoppingCart className="w-4 h-4" /> Add to Cart
+                <ShoppingCart className="w-4 h-4" /> {(t("product.addToCart") as string)}
               </button>
               <button
                 onClick={() => toggleWishlist(product.id)}
@@ -136,9 +154,9 @@ const ProductPage = () => {
             </div>
 
             <div className="flex gap-4 text-xs text-muted-foreground">
-              <span>✓ In Stock</span>
-              <span>✓ Free Shipping</span>
-              <span>✓ Easy Returns</span>
+              <span>✓ {(t("product.inStock") as string) || "In Stock"}</span>
+              <span>✓ {(t("trust.fastDelivery") as string)}</span>
+              <span>✓ {(t("trust.easyReturns") as string)}</span>
             </div>
           </motion.div>
         </div>
@@ -209,7 +227,7 @@ const ProductPage = () => {
             transition={{ duration: 0.5 }}
             className="mt-14"
           >
-            <h2 className="text-xl font-bold mb-6">Related Products</h2>
+            <h2 className="text-xl font-bold mb-6">{(t("product.related") as string) || "Related Products"}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {related.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
             </div>
