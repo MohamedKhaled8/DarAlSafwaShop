@@ -304,7 +304,7 @@ const ProductsManagement = () => {
                         alt={`صورة ${idx + 1}`}
                         className={`w-16 h-16 object-cover border shadow-sm rounded-lg cursor-pointer ${data.image === img ? "border-primary ring-2 ring-primary" : "border-slate-300 opacity-60 hover:opacity-100"}`}
                         onClick={() => setData({ image: img })}
-                        title="اضغط لجعلها الصورة الرئيسية"
+                        title={t("adminProducts.clickSetMain") as string}
                       />
                       <button type="button" onClick={() => removeImage(entry.localId, idx, isEdit)} className="absolute -top-1.5 -right-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-0.5 shadow-md transition-colors">
                         <X className="w-3 h-3" />
@@ -343,12 +343,12 @@ const ProductsManagement = () => {
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="gap-2 rounded-xl" onClick={handleOpenAdd}>
-              <Plus className="w-4 h-4" /> إضافة منتج
+              <Plus className="w-4 h-4" /> {t("adminProducts.addProduct") as string}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingProduct ? "تعديل منتج" : `إضافة منتجات (${productEntries.length})`}</DialogTitle>
+              <DialogTitle>{editingProduct ? (t("adminProducts.editProduct") as string) : `${t("adminProducts.addProduct") as string} (${productEntries.length})`}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-6 py-4">
               {editingProduct ? (
@@ -417,11 +417,11 @@ const ProductsManagement = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>المنتج</TableHead>
-                    <TableHead className="hidden md:table-cell">القسم</TableHead>
-                    <TableHead>السعر</TableHead>
-                    <TableHead className="hidden sm:table-cell">التقييم</TableHead>
-                    <TableHead className="hidden md:table-cell">المخزون</TableHead>
+                    <TableHead>{t("adminProducts.product") as string}</TableHead>
+                    <TableHead className="hidden md:table-cell">{t("adminProducts.category") as string}</TableHead>
+                    <TableHead>{t("adminProducts.price") as string}</TableHead>
+                    <TableHead className="hidden sm:table-cell">{t("adminProducts.rating") as string}</TableHead>
+                    <TableHead className="hidden md:table-cell">{t("adminProducts.stock") as string}</TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>

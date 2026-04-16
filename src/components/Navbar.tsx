@@ -150,14 +150,14 @@ const Navbar = () => {
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[100] origin-top-right"
+                        className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[9999] origin-top-right"
                       >
                         <div className="p-2">
                           {user ? (
                             <>
                               {[
                                 { label: t("nav.account") as string, icon: User, to: "/dashboard" },
-                                ...(!isAdmin ? [{ label: t("nav.orders") as string, icon: ShoppingCart, to: "/my-orders" }] : []),
+                                { label: isAdmin ? (t("admin.orders") as string) : (t("nav.orders") as string), icon: ShoppingCart, to: isAdmin ? "/admin/orders" : "/my-orders" },
                                 { label: t("nav.wishlist") as string, icon: Heart, to: "/dashboard?tab=wishlist" },
                               ].map((item) => (
                                 <Link
@@ -275,16 +275,14 @@ const Navbar = () => {
                 >
                   {t("top.printing") as string}
                 </Link>
-                {!isAdmin && (
-                  <Link 
-                    to="/my-orders" 
-                    className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
-                      isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-emerald-600 hover:bg-emerald-50"
-                    }`}
-                  >
-                    {t("nav.myOrdersStatus") as string}
-                  </Link>
-                )}
+                <Link 
+                  to={isAdmin ? "/admin/orders" : "/my-orders"}
+                  className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
+                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-emerald-600 hover:bg-emerald-50"
+                  }`}
+                >
+                  {isAdmin ? (t("admin.orders") as string) : (t("nav.myOrdersStatus") as string)}
+                </Link>
               </nav>
 
               {/* RIGHT: Logo (Rightmost in RTL) */}
