@@ -228,17 +228,16 @@ const Navbar = () => {
                     {t("nav.categories") as string}
                     <ChevronDown className={`w-4 h-4 transition-transform ${activeCategory === "categories" ? "rotate-180" : ""}`} />
                   </button>
-                </div>
-                {/* Categories Dropdown Panel */}
-                <AnimatePresence>
-                  {activeCategory === "categories" && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.97 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full mt-2 right-0 w-64 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[9999]"
-                    >
+                  {/* Categories Dropdown Panel */}
+                  <AnimatePresence>
+                    {activeCategory === "categories" && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.97 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute top-full mt-2 right-0 w-64 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[50]"
+                      >
                       <div className="p-2">
                         {categories.filter(c => c?.id).length === 0 ? (
                           <p className="text-sm text-slate-400 text-center py-4">{t("nav.noCategories") as string}</p>
@@ -267,6 +266,7 @@ const Navbar = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
+                </div>
                 <Link 
                   to="/printing" 
                   className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
