@@ -8,6 +8,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useCartContext } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { resolveCategoryName } from "@/lib/localizedContent";
 import { seedProducts, seedCategories } from "@/data/seedData";
 import type { Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
@@ -146,7 +147,7 @@ const HScroll = ({ children }: { children: React.ReactNode }) => {
    MAIN HOME PAGE
    ═══════════════════════════════════════════ */
 const HomePage = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const { products: allProducts, loading: productsLoading } = useProducts();
   const { categories: fetchedCategories, loading: categoriesLoading } = useCategories();
@@ -206,7 +207,7 @@ const HomePage = () => {
                 </div>
                 <div>
                   <span className="text-sm font-bold text-gray-800 group-hover:text-indigo-600 whitespace-nowrap transition-colors block">
-                    {c.name}
+                    {resolveCategoryName(c, language)}
                   </span>
                   <span className="text-[10px] font-semibold text-gray-400">{t("category.browseNow") as string}</span>
                 </div>

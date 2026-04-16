@@ -19,6 +19,7 @@ import { uploadToCloudinary } from "@/utils/cloudinary";
 interface ProductEntry {
   localId: string;
   name: string;
+  nameAr: string;
   price: number;
   originalPrice: number;
   image: string;
@@ -27,6 +28,7 @@ interface ProductEntry {
   rating: number;
   reviews: number;
   description: string;
+  descriptionAr: string;
   specs: Record<string, string>;
   inStock: boolean;
   isFlashSale: boolean;
@@ -36,6 +38,7 @@ interface ProductEntry {
 const makeNewEntry = (): ProductEntry => ({
   localId: `entry-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
   name: "",
+  nameAr: "",
   price: 0,
   originalPrice: 0,
   image: "",
@@ -44,6 +47,7 @@ const makeNewEntry = (): ProductEntry => ({
   rating: 4.5,
   reviews: 0,
   description: "",
+  descriptionAr: "",
   specs: {},
   inStock: true,
   isFlashSale: false,
@@ -132,8 +136,10 @@ const ProductsManagement = () => {
   };
 
   // ── Filtering ──
-  const filtered = products.filter(p => {
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
+  const filtered = products.filter((p) => {
+    const q = search.toLowerCase();
+    const matchSearch =
+      p.name.toLowerCase().includes(q) || (p.nameAr?.toLowerCase().includes(q) ?? false);
     const matchCat = catFilter === "all" || p.category === catFilter;
     return matchSearch && matchCat;
   });
@@ -149,6 +155,7 @@ const ProductsManagement = () => {
     setEditFormData({
       localId: product.id,
       name: product.name,
+      nameAr: product.nameAr || "",
       price: product.price,
       originalPrice: product.originalPrice || 0,
       image: product.image,
@@ -157,6 +164,7 @@ const ProductsManagement = () => {
       rating: product.rating,
       reviews: product.reviews,
       description: product.description,
+      descriptionAr: product.descriptionAr || "",
       specs: { ...product.specs },
       inStock: product.inStock,
       isFlashSale: product.isFlashSale || false,
@@ -183,6 +191,8 @@ const ProductsManagement = () => {
         const { localId, collapsed, ...data } = editFormData;
         await editProduct(editingProduct.id, {
           ...data,
+          nameAr: data.nameAr.trim() || undefined,
+          descriptionAr: data.descriptionAr.trim() || undefined,
           originalPrice: data.originalPrice > 0 ? data.originalPrice : undefined,
         });
         toast.success("تم تحديث المنتج بنجاح");
@@ -202,6 +212,8 @@ const ProductsManagement = () => {
           try {
             await addProduct({
               ...data,
+              nameAr: data.nameAr.trim() || undefined,
+              descriptionAr: data.descriptionAr.trim() || undefined,
               originalPrice: data.originalPrice > 0 ? data.originalPrice : undefined,
             });
             successCount++;
@@ -268,6 +280,11 @@ const ProductsManagement = () => {
         {!data.collapsed && (
           <>
             <Input placeholder="اسم المنتج" value={data.name} onChange={e => setData({ name: e.target.value })} required={index === 0} />
+            <Input
+              placeholder={(t("adminProducts.nameAr") as string) || "Arabic name (optional)"}
+              value={data.nameAr}
+              onChange={(e) => setData({ nameAr: e.target.value })}
+            />
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="السعر" type="number" step="0.01" value={data.price || ""} onChange={e => setData({ price: parseFloat(e.target.value) || 0 })} required={index === 0} />
               <Input placeholder="السعر قبل الخصم (اختياري)" type="number" step="0.01" value={data.originalPrice || ""} onChange={e => setData({ originalPrice: parseFloat(e.target.value) || 0 })} />
@@ -316,6 +333,12 @@ const ProductsManagement = () => {
             </div>
 
             <textarea className="min-h-[60px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="الوصف" value={data.description} onChange={e => setData({ description: e.target.value })} />
+            <textarea
+              className="min-h-[50px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              placeholder={(t("adminProducts.descriptionAr") as string) || "Arabic description (optional)"}
+              value={data.descriptionAr}
+              onChange={(e) => setData({ descriptionAr: e.target.value })}
+            />
 
             <div className="flex items-center gap-4">
               <label className="flex items-center gap-2 text-sm cursor-pointer">

@@ -4,10 +4,13 @@ import { motion } from "framer-motion";
 import { useCartContext } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import type { Product } from "@/data/products";
+import { resolveProductBadge, resolveProductName } from "@/lib/localizedContent";
 
 const ProductCard = ({ product, index = 0 }: { product: Product; index?: number }) => {
   const { addToCart } = useCartContext();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const displayName = resolveProductName(product, language);
+  const badgeLabel = resolveProductBadge(product.badge, language, t);
 
   const discount = 
     product.originalPrice && product.originalPrice > product.price
@@ -25,15 +28,15 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
       {/* ═══ IMAGE SECTION ═══ */}
       <div className="relative aspect-square w-full overflow-hidden bg-slate-50">
         {/* Badges */}
-        <div className="absolute top-2 right-2 z-20 flex flex-col gap-1.5">
+        <div className="absolute top-2 end-2 z-20 flex flex-col gap-1.5">
           {discount && (
             <span className="px-2 py-1 rounded-lg bg-rose-500 text-white text-[10px] font-black shadow-md shadow-rose-100">
               {discount}%-
             </span>
           )}
-          {product.badge && !discount && (
+          {product.badge && !discount && badgeLabel && (
             <span className="px-2 py-1 rounded-lg bg-violet-600 text-white text-[10px] font-black shadow-md shadow-violet-100 uppercase">
-              {product.badge}
+              {badgeLabel}
             </span>
           )}
         </div>
@@ -59,7 +62,7 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
             whileHover={{ scale: 1.08 }}
             transition={{ duration: 0.5 }}
             src={product.image}
-            alt={product.name}
+            alt={displayName}
             className="w-full h-full object-cover"
           />
         </Link>
@@ -68,12 +71,12 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
       {/* ═══ CONTENT SECTION ═══ */}
       <div className="p-3.5 flex flex-col flex-1 bg-white">
         <span className="text-[10px] font-bold text-violet-600 uppercase tracking-wider mb-1 opacity-70">
-          دار الصفوة
+          {(t("app.name") as string)}
         </span>
 
         <Link to={`/product/${product.id}`} className="mb-2 block group/title">
           <h3 className="text-[13px] font-bold text-slate-800 line-clamp-2 leading-snug group-hover/title:text-violet-600 transition-colors h-[2.8em]">
-            {product.name}
+            {displayName}
           </h3>
         </Link>
         
@@ -108,7 +111,7 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => addToCart({ id: product.id, name: product.name, price: product.price, image: product.image })}
+            onClick={() => addToCart({ id: product.id, name: displayName, price: product.price, image: product.image })}
             className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-violet-600 shadow-sm transition-colors"
           >
             <ShoppingCart className="w-4 h-4" />

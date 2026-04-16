@@ -12,6 +12,7 @@ import { useCategories, useProducts } from "@/hooks/useProducts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { resolveCategoryName, resolveProductName } from "@/lib/localizedContent";
 
 const iconMap: Record<string, React.ElementType> = {
   BookOpen, GraduationCap, Laptop, Gamepad2, Gift, Palette, PenTool,
@@ -44,7 +45,7 @@ const HighlightText = ({ text, query }: { text: string; query: string }) => {
 };
 
 const Navbar = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -74,7 +75,13 @@ const Navbar = () => {
   }, [cartCount]);
 
   const suggestions = searchQuery.length > 1
-    ? catalogProducts.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 6)
+    ? catalogProducts.filter((p) => {
+        const q = searchQuery.toLowerCase();
+        return (
+          p.name.toLowerCase().includes(q) ||
+          (p.nameAr?.toLowerCase().includes(q) ?? false)
+        );
+      }).slice(0, 6)
     : [];
 
   useEffect(() => {
@@ -150,7 +157,7 @@ const Navbar = () => {
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[9999] origin-top-right"
+                        className="absolute start-0 top-full mt-2 w-56 min-w-[14rem] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[9999] origin-top-start"
                       >
                         <div className="p-2">
                           {user ? (
@@ -166,14 +173,14 @@ const Navbar = () => {
                                   onClick={() => setUserOpen(false)}
                                   className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-50 transition-colors"
                                 >
-                                  <item.icon className="w-5 h-5 text-slate-500" />
-                                  <span className="text-sm font-bold text-slate-700 text-right w-full">{item.label}</span>
+                                  <item.icon className="w-5 h-5 text-slate-500 shrink-0" />
+                                  <span className="text-sm font-bold text-slate-700 text-start w-full">{item.label}</span>
                                 </Link>
                               ))}
                               <div className="border-t border-slate-100 my-2" />
                               <button
                                 onClick={handleLogout}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-rose-50 transition-colors w-full text-right"
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-rose-50 transition-colors w-full text-start"
                               >
                                 <LogOut className="w-5 h-5 text-rose-500" />
                                 <span className="text-sm font-bold text-rose-600">{t("nav.signOut") as string}</span>
@@ -202,7 +209,7 @@ const Navbar = () => {
                   }`}
                 >
                   <ShoppingCart className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
+                  <span className="absolute -top-1 -end-1 min-w-[18px] h-[18px] bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">
                     {cartCount}
                   </span>
                 </Link>
@@ -236,7 +243,7 @@ const Navbar = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.97 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full mt-2 right-0 left-auto w-64 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-visible z-[9999]"
+                        className="absolute top-full mt-2 start-0 w-64 min-w-[12rem] max-w-[min(18rem,calc(100vw-2rem))] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-visible z-[9999]"
                       >
                       <div className="p-2">
                         {categories.filter(c => c?.id).length === 0 ? (
@@ -255,8 +262,8 @@ const Navbar = () => {
                                   <Icon className="w-4 h-4 text-emerald-600" />
                                 </div>
                                 <div>
-                                  <span className="text-sm font-bold text-slate-700">{cat.name}</span>
-                                  {cat.count > 0 && <span className="text-xs text-slate-400 mr-2">({cat.count})</span>}
+                                  <span className="text-sm font-bold text-slate-700">{resolveCategoryName(cat, language)}</span>
+                                  {cat.count > 0 && <span className="text-xs text-slate-400 ms-2">({cat.count})</span>}
                                 </div>
                               </Link>
                             );
@@ -354,8 +361,8 @@ const Navbar = () => {
                         onClick={() => handleSuggestionClick(p.id)}
                         className="flex items-center gap-3 w-full px-3 py-2 hover:bg-emerald-50 rounded-xl text-left"
                       >
-                        <img src={p.image} alt={p.name} className="w-10 h-10 rounded-lg object-cover" />
-                        <span className="text-sm text-slate-700">{p.name}</span>
+                        <img src={p.image} alt={resolveProductName(p, language)} className="w-10 h-10 rounded-lg object-cover" />
+                        <span className="text-sm text-slate-700">{resolveProductName(p, language)}</span>
                       </button>
                     ))}
                   </div>
@@ -425,7 +432,7 @@ const Navbar = () => {
                         <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
                           <Icon className="w-4 h-4 text-emerald-600" />
                         </div>
-                        <span className="text-slate-700">{cat.name}</span>
+                        <span className="text-slate-700">{resolveCategoryName(cat, language)}</span>
                       </Link>
                     </motion.div>
                   );

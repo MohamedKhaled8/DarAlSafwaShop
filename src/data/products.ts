@@ -1,6 +1,8 @@
 export interface Product {
   id: string;
   name: string;
+  /** Arabic product title (Firestore / admin). Falls back to `name` when empty. */
+  nameAr?: string;
   price: number;
   originalPrice?: number;
   image: string;
@@ -10,6 +12,8 @@ export interface Product {
   reviews: number;
   badge?: string;
   description: string;
+  /** Arabic description; falls back to `description` when empty. */
+  descriptionAr?: string;
   specs: Record<string, string>;
   inStock: boolean;
   isFlashSale?: boolean;
@@ -18,6 +22,8 @@ export interface Product {
 export interface Category {
   id: string;
   name: string;
+  /** Arabic category title; falls back to seed catalog match or `name`. */
+  nameAr?: string;
   icon: string;
   image: string;
   count: number;

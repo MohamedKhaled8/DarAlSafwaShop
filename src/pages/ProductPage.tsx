@@ -3,9 +3,15 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Star, ShoppingCart, Heart, ChevronRight, Minus, Plus, Loader2 } from "lucide-react";
 import { useCartContext } from "@/contexts/CartContext";
-import { useProduct, useProductsByCategory } from "@/hooks/useProducts";
+import { useProduct, useProductsByCategory, useCategories } from "@/hooks/useProducts";
 import ProductCard from "@/components/ProductCard";
 import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  resolveCategoryName,
+  resolveProductBadge,
+  resolveProductDescription,
+  resolveProductName,
+} from "@/lib/localizedContent";
 
 const fakeReviews = [
   { name: "Emily R.", date: "2 weeks ago", rating: 5, text: "Excellent quality! Exactly what I was looking for. Fast shipping too." },
@@ -15,18 +21,19 @@ const fakeReviews = [
 
 const ProductPage = () => {
   const { id } = useParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { product, loading } = useProduct(id || "");
-  const { products: relatedProducts, loading: relatedLoading } = useProductsByCategory(product?.category || "");
+  const { products: relatedProducts } = useProductsByCategory(product?.category || "");
+  const { categories } = useCategories();
   const { addToCart, wishlist, toggleWishlist } = useCartContext();
-  const [activeTab, setActiveTab] = useState<string>("Description");
+  const [activeTab, setActiveTab] = useState<"desc" | "reviews" | "specs">("desc");
   const [qty, setQty] = useState(1);
   const [imageIdx, setImageIdx] = useState(0);
 
-  const tabs = [
-    t("product.description") as string || "Description",
-    t("product.reviews") as string || "Reviews", 
-    t("product.specifications") as string || "Specifications"
+  const tabDefs = [
+    { id: "desc" as const, label: (t("product.description") as string) || "Description" },
+    { id: "reviews" as const, label: (t("product.reviews") as string) || "Reviews" },
+    { id: "specs" as const, label: (t("product.specifications") as string) || "Specifications" },
   ];
 
   // Scroll to top when product ID changes
@@ -52,6 +59,15 @@ const ProductPage = () => {
   // Use real images array from product, fallback to single image
   const images = (product.images && product.images.length > 0) ? product.images : [product.image];
   const discount = product.originalPrice ? Math.round((1 - product.price / product.originalPrice) * 100) : 0;
+  const displayName = resolveProductName(product, language);
+  const displayDesc = resolveProductDescription(product, language);
+  const badgeText = resolveProductBadge(product.badge, language, t);
+  const categoryMeta = categories.find(
+    (c) => c.id === product.category || c.slug === product.category
+  );
+  const categoryLabel = categoryMeta
+    ? resolveCategoryName(categoryMeta, language)
+    : product.category;
 
   return (
     <main className="pb-20 lg:pb-0">
@@ -60,9 +76,11 @@ const ProductPage = () => {
         <nav className="flex items-center gap-1 text-xs text-muted-foreground mb-6">
           <Link to="/" className="hover:text-foreground transition-colors">{(t("nav.home") as string)}</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link to={`/category/${product.category}`} className="hover:text-foreground transition-colors capitalize">{product.category}</Link>
+          <Link to={`/category/${categoryMeta?.slug || categoryMeta?.id || product.category}`} className="hover:text-foreground transition-colors">
+            {categoryLabel}
+          </Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-foreground truncate max-w-[150px]">{product.name}</span>
+          <span className="text-foreground truncate max-w-[150px]">{displayName}</span>
         </nav>
 
         <div className="lg:flex gap-10">
@@ -74,7 +92,7 @@ const ProductPage = () => {
             className="lg:w-1/2 mb-8 lg:mb-0"
           >
             <div className="aspect-square rounded-2xl overflow-hidden bg-secondary mb-3">
-              <img src={images[imageIdx]} alt={product.name} className="w-full h-full object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in" />
+              <img src={images[imageIdx]} alt={displayName} className="w-full h-full object-cover transition-transform duration-300 hover:scale-110 cursor-zoom-in" />
             </div>
             <div className="flex gap-2">
               {images.map((img, i) => (
@@ -96,14 +114,14 @@ const ProductPage = () => {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="lg:w-1/2"
           >
-            {product.badge && (
+            {product.badge && badgeText && (
               <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 ${
                 product.badge === "Deal" ? "bg-accent/20 text-accent-foreground" : "bg-primary/10 text-primary"
               }`}>
-                {product.badge === "Deal" ? (t("product.off") as string) : product.badge}
+                {badgeText}
               </span>
             )}
-            <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-3">{product.name}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold leading-tight mb-3">{displayName}</h1>
             <div className="flex items-center gap-2 mb-4">
               <div className="flex gap-0.5">
                 {Array.from({ length: 5 }).map((_, i) => (
@@ -124,7 +142,7 @@ const ProductPage = () => {
               )}
             </div>
 
-            <p className="text-sm text-muted-foreground leading-relaxed mb-6">{product.description}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-6">{displayDesc}</p>
 
             <div className="flex items-center gap-3 mb-6">
               <div className="flex items-center border border-border rounded-full">
@@ -140,7 +158,7 @@ const ProductPage = () => {
 
             <div className="flex gap-3 mb-8">
               <button
-                onClick={() => { for (let i = 0; i < qty; i++) addToCart({ id: product.id, name: product.name, price: product.price, image: product.image }); }}
+                onClick={() => { for (let i = 0; i < qty; i++) addToCart({ id: product.id, name: displayName, price: product.price, image: product.image }); }}
                 className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-colors btn-press"
               >
                 <ShoppingCart className="w-4 h-4" /> {(t("product.addToCart") as string)}
@@ -170,23 +188,24 @@ const ProductPage = () => {
           className="mt-12"
         >
           <div className="flex gap-1 border-b border-border mb-6">
-            {tabs.map(tab => (
+            {tabDefs.map((tab) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors -mb-px ${
-                  activeTab === tab ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                  activeTab === tab.id ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {tab}
+                {tab.label}
               </button>
             ))}
           </div>
           <div className="min-h-[200px]">
-            {activeTab === "Description" && (
-              <p className="text-sm leading-relaxed text-muted-foreground max-w-2xl">{product.description} This premium product has been carefully selected for quality and value. Ideal for students, professionals, and hobbyists alike. Each item undergoes strict quality control before shipping.</p>
+            {activeTab === "desc" && (
+              <p className="text-sm leading-relaxed text-muted-foreground max-w-2xl">{displayDesc}</p>
             )}
-            {activeTab === "Reviews" && (
+            {activeTab === "reviews" && (
               <div className="space-y-4 max-w-2xl">
                 {fakeReviews.map((r, i) => (
                   <div key={i} className="p-4 rounded-xl bg-secondary/50">
@@ -205,7 +224,7 @@ const ProductPage = () => {
                 ))}
               </div>
             )}
-            {activeTab === "Specifications" && (
+            {activeTab === "specs" && (
               <div className="max-w-md">
                 {Object.entries(product.specs).map(([k, v]) => (
                   <div key={k} className="flex justify-between py-3 border-b border-border last:border-0">

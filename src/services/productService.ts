@@ -126,23 +126,30 @@ export const getDeals = async (limitCount: number = 8): Promise<Product[]> => {
 export const searchProducts = async (searchTerm: string): Promise<Product[]> => {
   try {
     // Firestore doesn't support full-text search, so we fetch and filter
-    const q = query(
+    const productsQuery = query(
       collection(db, PRODUCTS_COLLECTION),
       orderBy("name"),
       limit(100)
     );
-    const snapshot = await getDocs(q);
+    const snapshot = await getDocs(productsQuery);
     const products = snapshot.docs.map(doc => ({ 
       id: doc.id, 
       ...doc.data() 
     } as Product));
     
     // Filter client-side
-    return products.filter(p => 
-      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const needle = searchTerm.toLowerCase();
+    return products.filter((p) => {
+      const nameAr = p.nameAr?.toLowerCase() ?? "";
+      const descAr = p.descriptionAr?.toLowerCase() ?? "";
+      return (
+        p.name.toLowerCase().includes(needle) ||
+        nameAr.includes(needle) ||
+        p.category.toLowerCase().includes(needle) ||
+        p.description.toLowerCase().includes(needle) ||
+        descAr.includes(needle)
+      );
+    });
   } catch (error) {
     console.error("Error searching products:", error);
     throw new Error("Failed to search products");

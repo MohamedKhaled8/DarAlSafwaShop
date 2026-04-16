@@ -15,7 +15,7 @@ const CategoriesManagement = () => {
   const { t } = useLanguage();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any>(null);
-  const [formData, setFormData] = useState({ name: "", icon: "", image: "" });
+  const [formData, setFormData] = useState({ name: "", nameAr: "", icon: "", image: "" });
   const [actionLoading, setActionLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   
@@ -23,7 +23,7 @@ const CategoriesManagement = () => {
 
   const handleOpenAdd = () => {
     setEditingCategory(null);
-    setFormData({ name: "", icon: "", image: "" });
+    setFormData({ name: "", nameAr: "", icon: "", image: "" });
     setDialogOpen(true);
   };
 
@@ -31,6 +31,7 @@ const CategoriesManagement = () => {
     setEditingCategory(category);
     setFormData({
       name: category.name,
+      nameAr: category.nameAr || "",
       icon: category.icon || "",
       image: category.image || "",
     });
@@ -40,7 +41,7 @@ const CategoriesManagement = () => {
   const handleClose = () => {
     setDialogOpen(false);
     setEditingCategory(null);
-    setFormData({ name: "", icon: "", image: "" });
+    setFormData({ name: "", nameAr: "", icon: "", image: "" });
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,6 +73,7 @@ const CategoriesManagement = () => {
       if (editingCategory) {
         await updateCategory(editingCategory.id, {
           name: formData.name,
+          nameAr: formData.nameAr.trim() || undefined,
           icon: formData.icon,
           image: formData.image,
         });
@@ -79,6 +81,7 @@ const CategoriesManagement = () => {
       } else {
         await createCategory({
           name: formData.name,
+          nameAr: formData.nameAr.trim() || undefined,
           slug: formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-\u0600-\u06FF]/g, ''),
           icon: "Package",
           image: formData.image || "",
@@ -203,6 +206,14 @@ const CategoriesManagement = () => {
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                 required
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">{t("adminCategories.nameAr") as string}</label>
+              <Input
+                placeholder={t("adminCategories.nameAr") as string}
+                value={formData.nameAr}
+                onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
               />
             </div>
             <div>

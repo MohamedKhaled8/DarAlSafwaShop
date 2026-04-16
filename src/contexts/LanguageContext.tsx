@@ -86,6 +86,9 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "product.addToCart": "أضف للسلة",
     "product.outOfStock": "نفذت الكمية",
     "product.off": "خصم",
+    "product.badge.bestSeller": "الأكثر مبيعاً",
+    "product.badge.topRated": "الأعلى تقييماً",
+    "product.badge.popular": "شائع",
     
     // Sections
     "section.bestSellers": "الأكثر مبيعاً",
@@ -193,6 +196,8 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "category.minRating": "أقل تقييم",
     "category.allRatings": "كل التقييمات",
     "category.noMatchesFilters": "لا توجد منتجات ضمن الفلاتر الحالية",
+    "category.allProducts": "جميع المنتجات",
+    "category.noProductsHere": "لا توجد منتجات في هذا القسم بعد.",
     
     // Dashboard
     "dashboard.loginRequired": "يرجى تسجيل الدخول",
@@ -375,6 +380,8 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "adminProducts.search": "البحث في المنتجات...",
     "adminProducts.allCategories": "جميع الأقسام",
     "adminProducts.productName": "اسم المنتج",
+    "adminProducts.nameAr": "اسم المنتج بالعربية (اختياري)",
+    "adminProducts.descriptionAr": "الوصف بالعربية (اختياري)",
     "adminProducts.price": "السعر",
     "adminProducts.originalPrice": "السعر الأصلي (اختياري)",
     "adminProducts.category": "القسم",
@@ -438,6 +445,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "adminCategories.addNewCategory": "إضافة قسم جديد",
     "adminCategories.search": "البحث في الأقسام...",
     "adminCategories.categoryName": "اسم القسم",
+    "adminCategories.nameAr": "اسم القسم بالعربية (اختياري)",
     "adminCategories.categoryIcon": "أيقونة القسم",
     "adminCategories.productsCount": "عدد المنتجات",
     "adminCategories.noCategories": "لا توجد أقسام",
@@ -607,6 +615,9 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "product.addToCart": "Add to Cart",
     "product.outOfStock": "Out of Stock",
     "product.off": "OFF",
+    "product.badge.bestSeller": "Best Seller",
+    "product.badge.topRated": "Top Rated",
+    "product.badge.popular": "Popular",
     
     // Sections
     "section.bestSellers": "Best Sellers",
@@ -715,6 +726,8 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "category.minRating": "Minimum rating",
     "category.allRatings": "All ratings",
     "category.noMatchesFilters": "No products match the current filters",
+    "category.allProducts": "All products",
+    "category.noProductsHere": "No products in this category yet.",
     
     // Dashboard
     "dashboard.loginRequired": "Please Login",
@@ -897,6 +910,8 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "adminProducts.search": "Search products...",
     "adminProducts.allCategories": "All Categories",
     "adminProducts.productName": "Product name",
+    "adminProducts.nameAr": "Product name in Arabic (optional)",
+    "adminProducts.descriptionAr": "Description in Arabic (optional)",
     "adminProducts.price": "Price",
     "adminProducts.originalPrice": "Original price (optional)",
     "adminProducts.category": "Category",
@@ -960,6 +975,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "adminCategories.addNewCategory": "Add New Category",
     "adminCategories.search": "Search categories...",
     "adminCategories.categoryName": "Category name",
+    "adminCategories.nameAr": "Category name in Arabic (optional)",
     "adminCategories.categoryIcon": "Category icon",
     "adminCategories.productsCount": "Products count",
     "adminCategories.noCategories": "No categories found",

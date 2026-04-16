@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { getOrdersByCustomer } from "@/services/orderService";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { resolveProductName } from "@/lib/localizedContent";
 
 const DashboardPage = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -217,9 +218,9 @@ const DashboardPage = () => {
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {wishedProducts.map(p => (
                       <Link key={p.id} to={`/product/${p.id}`} className="flex gap-3 p-3 bg-card rounded-xl border border-border card-hover">
-                        <img src={p.image} alt={p.name} className="w-14 h-14 rounded-lg object-cover" />
+                        <img src={p.image} alt={resolveProductName(p, language)} className="w-14 h-14 rounded-lg object-cover" />
                         <div>
-                          <p className="text-sm font-medium line-clamp-1">{p.name}</p>
+                          <p className="text-sm font-medium line-clamp-1">{resolveProductName(p, language)}</p>
                           <p className="text-sm font-bold mt-1">{p.price.toFixed(2)} {t("currency") as string}</p>
                         </div>
                       </Link>
