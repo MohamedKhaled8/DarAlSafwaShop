@@ -176,6 +176,8 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "footer.customerService": "خدمة العملاء",
     "footer.contact": "تواصل معنا",
     "footer.followUs": "تابعنا",
+    "footer.walletTitle": "فودافون كاش أو إنستاباي",
+    "footer.walletHint": "للدفع والاستفسار",
     
     // No results
     "noResults": "لا توجد منتجات",
@@ -710,6 +712,8 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "footer.customerService": "Customer Service",
     "footer.contact": "Contact Us",
     "footer.followUs": "Follow Us",
+    "footer.walletTitle": "Vodafone Cash or InstaPay",
+    "footer.walletHint": "Payments & inquiries",
     
     // No results
     "noResults": "No products found",

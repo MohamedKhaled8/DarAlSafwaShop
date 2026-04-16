@@ -10,6 +10,7 @@ import { createOrder } from "@/services/orderService";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { INSTAPAY_ADDRESS, WALLET_PHONE_EN } from "@/lib/paymentWallet";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -246,7 +247,7 @@ const CheckoutPage = () => {
                     {paymentMethod === 'vodafone' && <Check className="w-5 h-5 text-primary" />}
                   </div>
                   <span className="font-semibold text-lg text-rose-600">Vodafone Cash</span>
-                  <span className="text-sm text-muted-foreground">Transfer to 01026331866</span>
+                  <span className="text-sm text-muted-foreground">Transfer to {WALLET_PHONE_EN}</span>
                 </label>
                 
                 <label className={`relative flex flex-col p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'instapay' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
@@ -256,7 +257,7 @@ const CheckoutPage = () => {
                     {paymentMethod === 'instapay' && <Check className="w-5 h-5 text-primary" />}
                   </div>
                   <span className="font-semibold text-lg text-indigo-600">InstaPay</span>
-                  <span className="text-sm text-muted-foreground">Transfer to dar-alsafwa</span>
+                  <span className="text-sm text-muted-foreground">InstaPay: {INSTAPAY_ADDRESS}</span>
                 </label>
               </div>
 
@@ -267,10 +268,10 @@ const CheckoutPage = () => {
                 </p>
                 <div className="flex items-center gap-3 p-3 bg-white border border-border shadow-sm rounded-lg mb-4">
                   <span className="font-mono text-xl tracking-widest text-slate-800 font-black flex-1 text-center">
-                    {paymentMethod === 'vodafone' ? "01026331866" : "dar-alsafwa@instapay"}
+                    {paymentMethod === "vodafone" ? WALLET_PHONE_EN : INSTAPAY_ADDRESS}
                   </span>
                   <Button variant="outline" size="sm" type="button" onClick={() => {
-                    navigator.clipboard.writeText(paymentMethod === 'vodafone' ? "01026331866" : "dar-alsafwa@instapay");
+                    navigator.clipboard.writeText(paymentMethod === "vodafone" ? WALLET_PHONE_EN : INSTAPAY_ADDRESS);
                     toast.success("Copied to clipboard!");
                   }}>
                      <Copy className="w-4 h-4" />

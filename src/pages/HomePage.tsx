@@ -21,18 +21,44 @@ const HERO_IMAGES = [
 ];
 
 /* ═══════ MARKETPLACE HERO ═══════ */
+const HERO_CROSSFADE_MS = 2200;
+const HERO_SLIDE_INTERVAL_MS = 5500;
+
 const DarAlSafwaHero = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
-  const [heroIdx, setHeroIdx] = useState(0);
+  /** Bottom layer index — always fully opaque */
+  const [baseIndex, setBaseIndex] = useState(0);
+  /** Top layer fades in over bottom; avoids black “between” two semi-transparent layers */
+  const [overlayVisible, setOverlayVisible] = useState(false);
+  const [cutTransition, setCutTransition] = useState(false);
+  const commitTimerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
-    const id = window.setInterval(() => {
-      setHeroIdx((i) => (i + 1) % HERO_IMAGES.length);
-    }, 5500);
-    return () => window.clearInterval(id);
+    const runCycle = () => {
+      if (commitTimerRef.current) window.clearTimeout(commitTimerRef.current);
+      setCutTransition(false);
+      requestAnimationFrame(() => {
+        setOverlayVisible(true);
+      });
+      commitTimerRef.current = window.setTimeout(() => {
+        setCutTransition(true);
+        setOverlayVisible(false);
+        setBaseIndex((i) => (i + 1) % HERO_IMAGES.length);
+        requestAnimationFrame(() => setCutTransition(false));
+      }, HERO_CROSSFADE_MS);
+    };
+
+    const id = window.setInterval(runCycle, HERO_SLIDE_INTERVAL_MS);
+    return () => {
+      window.clearInterval(id);
+      if (commitTimerRef.current) window.clearTimeout(commitTimerRef.current);
+    };
   }, []);
+
+  const bottomSrc = HERO_IMAGES[baseIndex];
+  const topSrc = HERO_IMAGES[(baseIndex + 1) % HERO_IMAGES.length];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,23 +69,30 @@ const DarAlSafwaHero = () => {
   return (
     <div className="relative w-full pb-20 -mt-20">
       <div className="w-full h-[550px] md:h-[650px] relative">
-        <div className="absolute inset-0 overflow-hidden bg-black shadow-lg">
+        <div className="absolute inset-0 overflow-hidden bg-neutral-950 shadow-lg">
           <div className="absolute inset-0">
-            {HERO_IMAGES.map((src, i) => (
-              <img
-                key={src}
-                src={src}
-                alt=""
-                decoding="async"
-                fetchPriority={i === 0 ? "high" : "low"}
-                className={`absolute inset-0 block h-full w-full min-h-full min-w-full object-cover object-center brightness-[0.52] ${
-                  i === heroIdx ? "opacity-100 z-[1]" : "opacity-0 z-0 pointer-events-none"
-                } transition-opacity duration-[2.2s] ease-in-out`}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
-              />
-            ))}
+            <img
+              src={bottomSrc}
+              alt=""
+              decoding="async"
+              fetchPriority="high"
+              className="absolute inset-0 z-0 block h-full w-full object-cover object-center brightness-[0.52]"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+            <img
+              src={topSrc}
+              alt=""
+              decoding="async"
+              style={cutTransition ? undefined : { transitionDuration: "2200ms" }}
+              className={`pointer-events-none absolute inset-0 z-[1] block h-full w-full object-cover object-center brightness-[0.52] ease-in-out ${
+                cutTransition ? "transition-none" : "transition-opacity"
+              } ${overlayVisible ? "opacity-100" : "opacity-0"}`}
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
             <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-black/80 via-black/15 to-black/45" />
           </div>
 

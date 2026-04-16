@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import { Phone } from "lucide-react";
 import { useCategories } from "@/hooks/useProducts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { resolveCategoryName } from "@/lib/localizedContent";
+import { WALLET_PHONE_AR, WALLET_PHONE_E164, WALLET_PHONE_EN } from "@/lib/paymentWallet";
 
 const Footer = () => {
   const { t, language } = useLanguage();
@@ -10,7 +12,7 @@ const Footer = () => {
   return (
   <footer className="bg-foreground text-primary-foreground mt-16">
     <div className="section-padding py-12">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
         <div>
           <div className="flex items-center gap-2 mb-4">
             <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
@@ -38,9 +40,20 @@ const Footer = () => {
         </div>
         <div>
           <h4 className="font-semibold text-sm mb-3">{t("footer.contact") as string}</h4>
-          <ul className="space-y-2">
+          <ul className="space-y-3">
             <li><span className="text-sm opacity-60">{t("top.help") as string}</span></li>
-            <li><span className="text-sm opacity-60">{t("footer.contact") as string}</span></li>
+            <li>
+              <p className="text-xs font-semibold opacity-80 mb-1">{t("footer.walletTitle") as string}</p>
+              <a
+                href={`tel:${WALLET_PHONE_E164}`}
+                className="inline-flex items-center gap-2 text-sm font-bold opacity-90 hover:opacity-100 transition-opacity"
+                dir="ltr"
+              >
+                <Phone className="w-4 h-4 shrink-0 opacity-70" />
+                {language === "ar" ? WALLET_PHONE_AR : WALLET_PHONE_EN}
+              </a>
+              <p className="text-xs opacity-50 mt-1">{t("footer.walletHint") as string}</p>
+            </li>
           </ul>
         </div>
       </div>

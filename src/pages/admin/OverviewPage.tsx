@@ -82,23 +82,23 @@ const OverviewPage = () => {
             transition={{ delay: index * 0.1 }}
           >
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <div className="w-10 h-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
                       <stat.icon className="w-5 h-5 text-primary" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
                       {stat.loading ? (
                         <Loader2 className="w-5 h-5 animate-spin text-muted-foreground mt-1" />
                       ) : (
-                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <p className="text-2xl font-bold break-words">{stat.value}</p>
                       )}
                     </div>
                   </div>
                   {stat.change && !stat.loading && (
-                    <div className={`flex items-center gap-1 text-xs font-medium ${stat.trend === "up" ? "text-green-600" : "text-red-600"}`}>
+                    <div className={`flex shrink-0 items-center gap-1 text-xs font-medium ${stat.trend === "up" ? "text-green-600" : "text-red-600"}`}>
                       {stat.trend === "up" ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                       {stat.change}
                     </div>

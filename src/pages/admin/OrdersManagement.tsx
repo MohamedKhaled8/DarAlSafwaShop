@@ -98,7 +98,7 @@ const OrdersManagement = () => {
         <p className="text-sm text-muted-foreground">{t("adminOrders.subtitle") as string}</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {summaryStats.map(s => (
           <Card key={s.label}>
             <CardContent className="p-4 text-center">
@@ -111,8 +111,8 @@ const OrdersManagement = () => {
 
       <Card>
         <CardHeader className="pb-3">
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row">
+            <div className="relative min-w-0 flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input 
                 placeholder={t("adminOrders.search") as string} 
