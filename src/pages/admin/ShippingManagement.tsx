@@ -63,14 +63,14 @@ const ShippingManagement = () => {
           rate: Number(formData.rate),
           isActive: formData.isActive,
         });
-        toast.success("Shipping rate updated");
+        toast.success(t("adminShipping.rateUpdated") as string);
       } else {
         await shippingService.add({
           name: formData.name,
           rate: Number(formData.rate),
           isActive: formData.isActive,
         });
-        toast.success("Shipping rate added");
+        toast.success(t("adminShipping.rateAdded") as string);
       }
       await refetch();
       handleClose();
@@ -82,11 +82,11 @@ const ShippingManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this shipping rate?")) return;
+    if (!confirm(t("common.confirmDelete") as string || "Are you sure?")) return;
     try {
       await shippingService.delete(id);
       await refetch();
-      toast.success("Shipping rate deleted");
+      toast.success(t("adminShipping.rateDeleted") as string);
     } catch (error: any) {
       toast.error(error.message || "Failed to delete shipping rate");
     }
@@ -96,7 +96,7 @@ const ShippingManagement = () => {
     try {
       await shippingService.update(rate.id, { isActive: !rate.isActive });
       await refetch();
-      toast.success("Status updated");
+      toast.success(t("adminCustomers.statusUpdated") as string);
     } catch (error: any) {
       toast.error("Failed to update status");
     }
@@ -106,13 +106,13 @@ const ShippingManagement = () => {
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Shipping Management</h1>
+          <h1 className="text-2xl font-bold">{t("adminShipping.title") as string}</h1>
           <p className="text-sm text-muted-foreground">
-            {loading ? t("loading") as string : `${rates.length} Governorates`}
+            {loading ? t("loading") as string : `${rates.length} ${t("adminShipping.governorates") as string}`}
           </p>
         </div>
         <Button className="gap-2 rounded-xl" onClick={handleOpenAdd}>
-          <Plus className="w-4 h-4" /> Add Governorate
+          <Plus className="w-4 h-4" /> {t("adminShipping.addGovernorate") as string}
         </Button>
       </div>
 
@@ -124,7 +124,7 @@ const ShippingManagement = () => {
         <div>
           {!loading && rates.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
-              <p>No shipping rates found. Add your first governorate.</p>
+              <p>{t("adminShipping.noRates") as string}</p>
             </div>
           )}
 
@@ -158,7 +158,7 @@ const ShippingManagement = () => {
                           className={`text-xs h-7 px-2 rounded-full ${rate.isActive ? 'border-primary/50 text-primary' : 'text-muted-foreground'}`}
                           onClick={() => toggleStatus(rate)}
                         >
-                          {rate.isActive ? 'Active' : 'Inactive'}
+                          {rate.isActive ? (t("adminShipping.active") as string) : (t("adminShipping.inactive") as string)}
                         </Button>
                         <div className="flex gap-1">
                           <Button 
@@ -192,25 +192,25 @@ const ShippingManagement = () => {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingRate ? "Edit Governorate" : "Add Governorate"}</DialogTitle>
+            <DialogTitle>{editingRate ? (t("adminShipping.editGovernorate") as string) : (t("adminShipping.addGovernorate") as string)}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="grid gap-4 py-4">
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Governorate Name *</label>
+              <label className="text-sm font-medium mb-1.5 block">{t("adminShipping.governorateName") as string} *</label>
               <select 
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 value={formData.name}
                 onChange={e => setFormData({ ...formData, name: e.target.value })}
                 required
               >
-                <option value="" disabled>Select Governorate</option>
+                <option value="" disabled>{t("adminShipping.selectGovernorate") as string}</option>
                 {EGYPT_GOVERNORATES.map(gov => (
                   <option key={gov} value={gov}>{gov}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Shipping Rate (EGP) *</label>
+              <label className="text-sm font-medium mb-1.5 block">{t("adminShipping.shippingRate") as string} *</label>
               <Input 
                 type="number"
                 min="0"
@@ -230,7 +230,7 @@ const ShippingManagement = () => {
                 className="w-4 h-4 rounded text-primary border-muted focus:ring-primary"
               />
               <label htmlFor="isActive" className="text-sm font-medium cursor-pointer">
-                Available for Shipping
+                {t("adminShipping.available") as string}
               </label>
             </div>
             <Button 
@@ -241,10 +241,10 @@ const ShippingManagement = () => {
               {actionLoading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
+                  {t("adminShipping.saving") as string}
                 </>
               ) : (
-                 "Save Governorate"
+                 t("adminShipping.saveGovernorate") as string
               )}
             </Button>
           </form>

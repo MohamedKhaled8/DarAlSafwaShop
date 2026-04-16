@@ -152,10 +152,16 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "product.quantity": "الكمية",
     
     // Common
-    "common.items": "منتجات",
+    "common.items": "منتج",
     "common.startShopping": "ابدأ التسوق",
     "common.email": "البريد الإلكتروني",
     "common.nA": "غير متاح",
+    "common.confirmDelete": "هل أنت متأكد من حذف هذا العنصر؟",
+    
+    // Language
+    "language.title": "اللغة",
+    "language.arabic": "العربية",
+    "language.english": "English",
     
     // Footer
     "footer.rights": "جميع الحقوق محفوظة",
@@ -311,6 +317,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "adminPrinting.activeJobs": "مهام نشطة",
     "adminPrinting.todaysRevenue": "إيرادات اليوم",
     "adminPrinting.completed": "مكتمل",
+    "adminPrinting.pending": "معلق",
     "adminPrinting.search": "ابحث في طلبات الطباعة...",
     "adminPrinting.order": "الطلب",
     "adminPrinting.file": "الملف",
@@ -330,7 +337,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "adminPrinting.customer": "العميل",
     "adminPrinting.printDetails": "تفاصيل الطباعة",
     "adminPrinting.paper": "الورق",
-    "adminPrinting.doubleSided": "双面",
+    "adminPrinting.doubleSided": "وجهين",
     "adminPrinting.notes": "ملاحظات",
     "adminPrinting.statusUpdated": "تم تحديث حالة الطلب",
     "adminPrinting.orderDeleted": "تم حذف الطلب",
@@ -488,6 +495,24 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "adminSettings.customerMessages": "رسائل العملاء",
     "adminSettings.customerDesc": "استلام إشعار عندما يرسل عميل رسالة",
     "adminSettings.shippingRate": "معدل الشحن",
+    
+    // Admin Shipping
+    "adminShipping.title": "إدارة الشحن",
+    "adminShipping.governorates": "المحافظات",
+    "adminShipping.addGovernorate": "إضافة محافظة",
+    "adminShipping.noRates": "لا توجد أسعار شحن. أضف محافظتك الأولى.",
+    "adminShipping.governorateName": "اسم المحافظة",
+    "adminShipping.selectGovernorate": "اختر المحافظة",
+    "adminShipping.shippingRate": "سعر الشحن (EGP)",
+    "adminShipping.available": "متاح للشحن",
+    "adminShipping.active": "نشط",
+    "adminShipping.inactive": "غير نشط",
+    "adminShipping.editGovernorate": "تعديل المحافظة",
+    "adminShipping.saveGovernorate": "حفظ المحافظة",
+    "adminShipping.saving": "جاري الحفظ...",
+    "adminShipping.rateUpdated": "تم تحديث سعر الشحن",
+    "adminShipping.rateAdded": "تم إضافة سعر الشحن",
+    "adminShipping.rateDeleted": "تم حذف سعر الشحن",
     
     // Admin Seed Data
     "adminSeed.title": "بيانات تجريبية",
@@ -647,6 +672,12 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "common.startShopping": "Start Shopping",
     "common.email": "Email",
     "common.nA": "N/A",
+    "common.confirmDelete": "Are you sure you want to delete this item?",
+    
+    // Language
+    "language.title": "Language",
+    "language.arabic": "العربية",
+    "language.english": "English",
     
     // Footer
     "footer.rights": "All rights reserved",
@@ -802,6 +833,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "adminPrinting.activeJobs": "Active Jobs",
     "adminPrinting.todaysRevenue": "Today's Revenue",
     "adminPrinting.completed": "Completed",
+    "adminPrinting.pending": "Pending",
     "adminPrinting.search": "Search print orders...",
     "adminPrinting.order": "Order",
     "adminPrinting.file": "File",
@@ -978,6 +1010,24 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "adminSettings.customerMessages": "Customer Messages",
     "adminSettings.customerDesc": "Receive notification when a customer sends a message",
     "adminSettings.shippingRate": "Shipping Rate",
+    
+    // Admin Shipping
+    "adminShipping.title": "Shipping Management",
+    "adminShipping.governorates": "Governorates",
+    "adminShipping.addGovernorate": "Add Governorate",
+    "adminShipping.noRates": "No shipping rates found. Add your first governorate.",
+    "adminShipping.governorateName": "Governorate Name",
+    "adminShipping.selectGovernorate": "Select Governorate",
+    "adminShipping.shippingRate": "Shipping Rate (EGP)",
+    "adminShipping.available": "Available for Shipping",
+    "adminShipping.active": "Active",
+    "adminShipping.inactive": "Inactive",
+    "adminShipping.editGovernorate": "Edit Governorate",
+    "adminShipping.saveGovernorate": "Save Governorate",
+    "adminShipping.saving": "Saving...",
+    "adminShipping.rateUpdated": "Shipping rate updated",
+    "adminShipping.rateAdded": "Shipping rate added",
+    "adminShipping.rateDeleted": "Shipping rate deleted",
     
     // Admin Seed Data
     "adminSeed.title": "Seed Data",

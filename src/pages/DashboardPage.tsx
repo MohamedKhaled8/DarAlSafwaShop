@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useSearchParams } from "react-router-dom";
-import { User, Package, Heart, Settings, Shield, Loader2, MapPin, Phone, Mail, Edit } from "lucide-react";
+import { User, Package, Heart, Settings, Shield, Loader2, MapPin, Phone, Mail, Edit, Globe } from "lucide-react";
 import { useCartContext } from "@/contexts/CartContext";
 import { useAuth } from "@/hooks/useAuth";
 import { useOrders } from "@/hooks/useOrders";
@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const DashboardPage = () => {
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const { wishlist } = useCartContext();
   const { user, profile, isAdmin } = useAuth();
   const { products } = useProducts(100);
@@ -117,7 +117,7 @@ const DashboardPage = () => {
             
             <nav className="space-y-1">
               {[
-                ...(user ? [{ icon: Package, label: (t("nav.orders") as string), id: "orders" }] : []),
+                ...(user && !isAdmin ? [{ icon: Package, label: (t("nav.orders") as string), id: "orders" }] : []),
                 { icon: Heart, label: (t("nav.wishlist") as string), id: "wishlist" },
                 ...(user ? [{ icon: Settings, label: (t("dashboard.settings") as string) || "Settings", id: "settings" }] : []),
               ].map(({ icon: Icon, label, id }) => (
@@ -137,6 +137,33 @@ const DashboardPage = () => {
                   <Shield className="w-4 h-4" /> {(t("nav.admin") as string)}
                 </Link>
               )}
+              
+              {/* Language Selector */}
+              <div className="pt-4 mt-4 border-t border-border">
+                <p className="text-xs text-muted-foreground mb-2 px-4">{(t("language.title") as string) || "Language"}</p>
+                <div className="flex gap-2 px-4">
+                  <button
+                    onClick={() => setLanguage("ar")}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                      language === "ar" 
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-secondary hover:bg-secondary/80"
+                    }`}
+                  >
+                    العربية
+                  </button>
+                  <button
+                    onClick={() => setLanguage("en")}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                      language === "en" 
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-secondary hover:bg-secondary/80"
+                    }`}
+                  >
+                    English
+                  </button>
+                </div>
+              </div>
             </nav>
           </motion.aside>
 
