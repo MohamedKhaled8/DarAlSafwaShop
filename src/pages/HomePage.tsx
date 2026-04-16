@@ -43,8 +43,8 @@ const DarAlSafwaHero = () => {
   return (
     <div className="relative w-full pb-20 -mt-20">
       <div className="w-full h-[550px] md:h-[650px] relative">
-        <div className="absolute inset-0 rounded-b-lg md:rounded-b-[20px] overflow-hidden shadow-lg bg-slate-900">
-          <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 overflow-hidden bg-black shadow-lg">
+          <div className="absolute inset-0">
             {HERO_IMAGES.map((src, i) => (
               <img
                 key={src}
@@ -52,12 +52,15 @@ const DarAlSafwaHero = () => {
                 alt=""
                 decoding="async"
                 fetchPriority={i === 0 ? "high" : "low"}
-                className={`absolute inset-0 h-full w-full object-cover object-center brightness-[0.48] scale-[1.02] ${
-                  i === heroIdx ? "opacity-100 z-[1]" : "opacity-0 z-0"
+                className={`absolute inset-0 block h-full w-full min-h-full min-w-full object-cover object-center brightness-[0.52] ${
+                  i === heroIdx ? "opacity-100 z-[1]" : "opacity-0 z-0 pointer-events-none"
                 } transition-opacity duration-[2.2s] ease-in-out`}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = "none";
+                }}
               />
             ))}
-            <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-slate-900/85 via-slate-900/20 to-slate-900/35" />
+            <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-black/80 via-black/15 to-black/45" />
           </div>
 
           <div className="relative z-10 w-full h-full flex flex-col items-center justify-center text-center px-6 pt-20">
@@ -78,8 +81,8 @@ const DarAlSafwaHero = () => {
 
         <div className="absolute -bottom-8 left-0 right-0 z-30 px-6">
           <form onSubmit={handleSearch} className="max-w-4xl mx-auto">
-            <div className="flex flex-row-reverse items-center bg-white rounded-2xl md:rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.15)] overflow-hidden transition-all duration-300 ring-1 ring-black/5">
-              <button type="submit" className="bg-slate-900 hover:bg-violet-600 text-white p-5 md:p-6 transition-all shrink-0">
+            <div className="flex flex-row-reverse items-center bg-white shadow-[0_20px_40px_rgba(0,0,0,0.15)] overflow-hidden transition-all duration-300 ring-1 ring-black/5 rounded-none">
+              <button type="submit" className="bg-slate-900 hover:bg-violet-600 text-white p-5 md:p-6 transition-all shrink-0 rounded-none">
                 <Search className="w-7 h-7 md:w-9 md:h-9" />
               </button>
               <input
