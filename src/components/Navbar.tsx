@@ -51,6 +51,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [desktopSearchActive, setDesktopSearchActive] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -86,7 +87,10 @@ const Navbar = () => {
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchFocused(false);
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchFocused(false);
+        setDesktopSearchActive(false);
+      }
       if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false);
       if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) setActiveCategory(null);
     };
@@ -104,6 +108,13 @@ const Navbar = () => {
     setSearchFocused(false);
     setSearchQuery("");
   }, [navigate]);
+
+  const goSearchResults = useCallback(() => {
+    const q = searchQuery.trim();
+    if (q.length < 2) return;
+    navigate(`/search?q=${encodeURIComponent(q)}`);
+    setSearchFocused(false);
+  }, [navigate, searchQuery]);
 
   const handleLogout = async () => {
     try {
@@ -216,7 +227,7 @@ const Navbar = () => {
               </div>
 
               {/* CENTER: Navigation Links */}
-              <nav className="hidden lg:flex items-center gap-2 flex-1 justify-center px-4" ref={categoryRef}>
+              <nav className="hidden lg:flex items-center gap-2 shrink-0 justify-center px-2" ref={categoryRef}>
                 <Link 
                   to="/" 
                   className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
@@ -292,6 +303,58 @@ const Navbar = () => {
                 </Link>
               </nav>
 
+              {/* Desktop search */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  goSearchResults();
+                }}
+                className="hidden lg:flex flex-1 min-w-0 max-w-md justify-center px-2"
+              >
+                <div ref={searchRef} className="relative w-full">
+                  <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setDesktopSearchActive(true)}
+                    onBlur={() => {
+                      window.setTimeout(() => setDesktopSearchActive(false), 180);
+                    }}
+                    placeholder={t("nav.searchPlaceholder") as string}
+                    className={`w-full rounded-full border py-2.5 ps-10 pe-4 text-sm font-medium outline-none transition-colors ${
+                      isHome && !scrolled
+                        ? "border-white/25 bg-white/15 text-white placeholder:text-white/70 focus:border-white/50 focus:bg-white/20"
+                        : "border-slate-200 bg-slate-50 text-slate-800 placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white"
+                    }`}
+                  />
+                  {desktopSearchActive && suggestions.length > 0 && (
+                    <div className="absolute start-0 end-0 top-full mt-2 rounded-2xl border border-slate-100 bg-white shadow-xl z-[100] overflow-hidden max-h-72 overflow-y-auto">
+                      {suggestions.map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => handleSuggestionClick(p.id)}
+                          className="flex w-full items-center gap-3 px-4 py-3 text-start hover:bg-emerald-50"
+                        >
+                          <img src={p.image} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />
+                          <span className="text-sm font-medium text-slate-800 line-clamp-2">
+                            {resolveProductName(p, language)}
+                          </span>
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={goSearchResults}
+                        className="w-full border-t border-slate-100 px-4 py-3 text-center text-sm font-bold text-emerald-700 hover:bg-emerald-50"
+                      >
+                        {t("search.viewAll") as string}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </form>
+
               {/* RIGHT: Logo (Rightmost in RTL) */}
               <Link to="/" className="shrink-0">
                 <motion.div 
@@ -309,13 +372,27 @@ const Navbar = () => {
                 </motion.div>
               </Link>
 
-              {/* MOBILE: Menu Toggle */}
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className={`lg:hidden p-2 rounded-lg transition-colors ${isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700"}`}
-              >
-                {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+              {/* MOBILE: Search + menu */}
+              <div className="flex items-center gap-1 lg:hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchFocused(true);
+                    setMenuOpen(false);
+                  }}
+                  className={`p-2 rounded-lg transition-colors ${isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700"}`}
+                  aria-label={t("nav.searchPlaceholder") as string}
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className={`p-2 rounded-lg transition-colors ${isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700"}`}
+                >
+                  {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -341,14 +418,20 @@ const Navbar = () => {
               exit={{ opacity: 0, y: -20 }}
               className="fixed top-20 left-4 right-4 z-[70] md:hidden"
             >
-              <div className="bg-white rounded-2xl shadow-xl p-3">
+              <form
+                className="bg-white rounded-2xl shadow-xl p-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  goSearchResults();
+                }}
+              >
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
                   <input
                     type="text"
                     placeholder={t("nav.search") as string}
                     value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                     autoFocus
                     className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-100 text-sm focus:outline-none"
                   />
@@ -358,6 +441,7 @@ const Navbar = () => {
                     {suggestions.map((p) => (
                       <button
                         key={p.id}
+                        type="button"
                         onClick={() => handleSuggestionClick(p.id)}
                         className="flex items-center gap-3 w-full px-3 py-2 hover:bg-emerald-50 rounded-xl text-left"
                       >
@@ -365,9 +449,15 @@ const Navbar = () => {
                         <span className="text-sm text-slate-700">{resolveProductName(p, language)}</span>
                       </button>
                     ))}
+                    <button
+                      type="submit"
+                      className="mt-1 w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white hover:bg-emerald-700"
+                    >
+                      {t("search.viewAll") as string}
+                    </button>
                   </div>
                 )}
-              </div>
+              </form>
             </motion.div>
           </>
         )}

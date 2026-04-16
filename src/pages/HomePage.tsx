@@ -9,72 +9,62 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useCartContext } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { resolveCategoryName } from "@/lib/localizedContent";
-import { seedProducts, seedCategories } from "@/data/seedData";
-import type { Product } from "@/data/products";
 import ProductCard from "@/components/ProductCard";
 import { useProducts, useCategories } from "@/hooks/useProducts";
 
-const HERO_SLIDES = [
-  {
-    tag: "عرض لفترة محدودة",
-    title: "مجموعة العودة <br/> للمدارس 2024",
-    subtitle: "كل ما يحتاجه طفلك في مكان واحد بخصومات تصل لـ 50%",
-    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
-    bg: "bg-[#fde047]", // Noon Yellow
-    text: "text-slate-900",
-    btnColor: "bg-slate-900 text-white"
-  },
-  {
-    tag: "إصدارات جديدة",
-    title: "ركن القراءة <br/> المميز بالدار",
-    subtitle: "أحدث الروايات والكتب العلمية بأفضل الأسعار حصرياً",
-    image: "https://images.unsplash.com/photo-1524578271613-d550eebad474?w=800&q=80",
-    bg: "bg-[#4338ca]", // Indigo
-    text: "text-white",
-    btnColor: "bg-white text-indigo-600"
-  }
+const HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1920&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1521587760476-4c4a0b0af8b4?w=1920&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=80&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1524995997946-a1c30390a16a?w=1920&q=80&auto=format&fit=crop",
 ];
-
-// No static fallbacks. The store only relies on real database data.
 
 /* ═══════ MARKETPLACE HERO ═══════ */
 const DarAlSafwaHero = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [heroIdx, setHeroIdx] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setHeroIdx((i) => (i + 1) % HERO_IMAGES.length);
+    }, 5500);
+    return () => window.clearInterval(id);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) navigate(`/search?q=${query}`);
+    const q = query.trim();
+    if (q.length >= 2) navigate(`/search?q=${encodeURIComponent(q)}`);
   };
 
   return (
     <div className="relative w-full pb-20 -mt-20">
-      {/* ═══ MINIMALIST HIGH-END HERO ═══ */}
       <div className="w-full h-[550px] md:h-[650px] relative">
         <div className="absolute inset-0 rounded-b-lg md:rounded-b-[20px] overflow-hidden shadow-lg bg-slate-900">
-          {/* Background Image */}
           <div className="absolute inset-0 z-0">
-            <motion.img 
-              initial={{ scale: 1.05 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 12 }}
-              src="https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1920&q=80" 
-              alt="Dar Al Safwa" 
-              className="w-full h-full object-cover brightness-50" 
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544640808-32ca72ac7f37?w=1920&q=80';
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-at-t from-slate-900/80 via-transparent to-slate-900/20"></div>
+            {HERO_IMAGES.map((src, i) => (
+              <img
+                key={src}
+                src={src}
+                alt=""
+                decoding="async"
+                fetchPriority={i === 0 ? "high" : "low"}
+                className={`absolute inset-0 h-full w-full object-cover object-center brightness-[0.48] scale-[1.02] ${
+                  i === heroIdx ? "opacity-100 z-[1]" : "opacity-0 z-0"
+                } transition-opacity duration-[2.2s] ease-in-out`}
+              />
+            ))}
+            <div className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-slate-900/85 via-slate-900/20 to-slate-900/35" />
           </div>
 
-          {/* Hero Content */}
           <div className="relative z-10 w-full h-full flex flex-col items-center justify-center text-center px-6 pt-20">
             <motion.div
-               initial={{ opacity: 0, y: 30 }}
-               animate={{ opacity: 1, y: 0 }}
-               transition={{ duration: 0.8 }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
             >
               <h1 className="text-5xl md:text-8xl font-black text-white mb-6 drop-shadow-2xl">
                 {t("app.name") as string}
@@ -86,28 +76,18 @@ const DarAlSafwaHero = () => {
           </div>
         </div>
 
-        {/* ═══ FLOATING SEARCH BAR ═══ */}
         <div className="absolute -bottom-8 left-0 right-0 z-30 px-6">
-          <form 
-            onSubmit={handleSearch}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="flex flex-row-reverse items-center bg-white rounded-2xl md:rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.15)] border-[4px] border-white overflow-hidden transition-all duration-300">
-              {/* Search Button */}
-              <button 
-                type="submit"
-                className="bg-slate-900 hover:bg-violet-600 text-white p-5 md:p-6 transition-all"
-              >
+          <form onSubmit={handleSearch} className="max-w-4xl mx-auto">
+            <div className="flex flex-row-reverse items-center bg-white rounded-2xl md:rounded-[24px] shadow-[0_20px_40px_rgba(0,0,0,0.15)] overflow-hidden transition-all duration-300 ring-1 ring-black/5">
+              <button type="submit" className="bg-slate-900 hover:bg-violet-600 text-white p-5 md:p-6 transition-all shrink-0">
                 <Search className="w-7 h-7 md:w-9 md:h-9" />
               </button>
-
-              {/* Input Field */}
-              <input 
+              <input
                 type="text"
                 placeholder={t("nav.searchPlaceholder") as string}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full bg-transparent px-8 py-5 md:py-6 text-xl md:text-2xl font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none text-right"
+                className="w-full min-w-0 bg-transparent px-8 py-5 md:py-6 text-xl md:text-2xl font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none text-right"
               />
             </div>
           </form>
@@ -115,7 +95,7 @@ const DarAlSafwaHero = () => {
       </div>
     </div>
   );
-}
+};
 
 /* ═══════ HORIZONTAL SCROLL ═══════ */
 const HScroll = ({ children }: { children: React.ReactNode }) => {

@@ -180,6 +180,10 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     // No results
     "noResults": "لا توجد منتجات",
     "suggestions": "اقتراحات",
+    "search.title": "نتائج البحث",
+    "search.for": "عن",
+    "search.hint": "اكتب حرفين على الأقل للبحث في المنتجات.",
+    "search.viewAll": "عرض كل النتائج",
     
     // Cart
     "cart.empty": "السلة فارغة",
@@ -710,6 +714,10 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     // No results
     "noResults": "No products found",
     "suggestions": "Suggestions",
+    "search.title": "Search results",
+    "search.for": "for",
+    "search.hint": "Type at least 2 characters to search products.",
+    "search.viewAll": "View all results",
     
     // Cart
     "cart.empty": "Your cart is empty",

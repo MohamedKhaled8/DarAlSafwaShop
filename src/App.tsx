@@ -20,6 +20,7 @@ import RegisterPage from "@/pages/RegisterPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import InvoicePage from "@/pages/InvoicePage";
 import MyOrdersPage from "@/pages/MyOrdersPage";
+import SearchPage from "@/pages/SearchPage";
 import { AuthProvider } from "@/contexts/AuthContext";
 import AdminLayout from "@/pages/admin/AdminLayout";
 import OverviewPage from "@/pages/admin/OverviewPage";
@@ -54,6 +55,7 @@ const App = () => (
                 
                 {/* Storefront */}
               <Route path="/" element={<><Navbar /><HomePage /><Footer /><MobileNav /></>} />
+              <Route path="/search" element={<><Navbar /><SearchPage /><Footer /><MobileNav /></>} />
               <Route path="/category/:id" element={<><Navbar /><CategoryPage /><Footer /><MobileNav /></>} />
               <Route path="/product/:id" element={<><Navbar /><ProductPage /><Footer /><MobileNav /></>} />
               <Route path="/cart" element={<><Navbar /><CartPage /><Footer /><MobileNav /></>} />

@@ -154,6 +154,8 @@ export const useSearchProducts = (searchTerm: string) => {
   useEffect(() => {
     if (!searchTerm || searchTerm.length < 2) {
       setProducts([]);
+      setLoading(false);
+      setError(null);
       return;
     }
 
