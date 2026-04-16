@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { useCartContext } from "@/contexts/CartContext";
-import { useCategories, useProducts } from "@/hooks/useProducts";
+import { useCategories, useProducts, getCategoryDisplayName } from "@/hooks/useProducts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -17,18 +17,21 @@ const iconMap: Record<string, React.ElementType> = {
   BookOpen, GraduationCap, Laptop, Gamepad2, Gift, Palette, PenTool,
 };
 
-// Dar Al Safwa Logo Component
-const DarAlSafwaLogo = () => (
-  <motion.div 
-    className="flex items-center gap-2"
-    whileHover={{ scale: 1.02 }}
-  >
-    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-200">
-      <BookOpen className="w-5 h-5 text-white" />
-    </div>
-    <span className="font-bold text-xl text-slate-800">دار الصفوة</span>
-  </motion.div>
-);
+// Brand block for mobile drawer (follows active language)
+const DarAlSafwaLogo = () => {
+  const { t } = useLanguage();
+  return (
+    <motion.div
+      className="flex items-center gap-2"
+      whileHover={{ scale: 1.02 }}
+    >
+      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-200">
+        <BookOpen className="w-5 h-5 text-white" />
+      </div>
+      <span className="font-bold text-xl text-slate-800">{t("app.name") as string}</span>
+    </motion.div>
+  );
+};
 
 const HighlightText = ({ text, query }: { text: string; query: string }) => {
   if (!query) return <>{text}</>;
@@ -44,7 +47,7 @@ const HighlightText = ({ text, query }: { text: string; query: string }) => {
 };
 
 const Navbar = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -150,7 +153,7 @@ const Navbar = () => {
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[9999] origin-top-right"
+                        className="absolute start-0 top-full mt-2 w-56 min-w-[14rem] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[9999] origin-top-start"
                       >
                         <div className="p-2">
                           {user ? (
@@ -166,14 +169,14 @@ const Navbar = () => {
                                   onClick={() => setUserOpen(false)}
                                   className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-50 transition-colors"
                                 >
-                                  <item.icon className="w-5 h-5 text-slate-500" />
-                                  <span className="text-sm font-bold text-slate-700 text-right w-full">{item.label}</span>
+                                  <item.icon className="w-5 h-5 text-slate-500 shrink-0" />
+                                  <span className="text-sm font-bold text-slate-700 text-end w-full">{item.label}</span>
                                 </Link>
                               ))}
                               <div className="border-t border-slate-100 my-2" />
                               <button
                                 onClick={handleLogout}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-rose-50 transition-colors w-full text-right"
+                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-rose-50 transition-colors w-full text-end"
                               >
                                 <LogOut className="w-5 h-5 text-rose-500" />
                                 <span className="text-sm font-bold text-rose-600">{t("nav.signOut") as string}</span>
@@ -236,7 +239,7 @@ const Navbar = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.97 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute top-full mt-2 right-0 left-auto w-64 bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-visible z-[9999]"
+                        className="absolute top-full mt-2 start-0 w-64 max-w-[min(16rem,calc(100vw-1.5rem))] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-visible z-[9999] origin-top-start"
                       >
                       <div className="p-2">
                         {categories.filter(c => c?.id).length === 0 ? (
@@ -255,7 +258,7 @@ const Navbar = () => {
                                   <Icon className="w-4 h-4 text-emerald-600" />
                                 </div>
                                 <div>
-                                  <span className="text-sm font-bold text-slate-700">{cat.name}</span>
+                                  <span className="text-sm font-bold text-slate-700">{getCategoryDisplayName(cat, language)}</span>
                                   {cat.count > 0 && <span className="text-xs text-slate-400 mr-2">({cat.count})</span>}
                                 </div>
                               </Link>
@@ -425,7 +428,7 @@ const Navbar = () => {
                         <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
                           <Icon className="w-4 h-4 text-emerald-600" />
                         </div>
-                        <span className="text-slate-700">{cat.name}</span>
+                        <span className="text-slate-700">{getCategoryDisplayName(cat, language)}</span>
                       </Link>
                     </motion.div>
                   );

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import type { Language } from "@/contexts/LanguageContext";
 import {
   getAllProducts,
   getProductById,
@@ -188,7 +189,19 @@ const categoryNameMap: Record<string, { ar: string; en: string }> = {
   "art": { ar: "أدوات فنية", en: "Art Supplies" },
   "office": { ar: "أدوات مكتبية", en: "Office Supplies" },
   "digital": { ar: "منتجات رقمية", en: "Digital Products" },
+  "chess": { ar: "شطرنج", en: "Chess" },
 };
+
+/** Localized category label when slug/id is known; otherwise falls back to stored name. */
+export function getCategoryDisplayName(
+  cat: Pick<Category, "id" | "slug" | "name">,
+  language: Language
+): string {
+  const key = (cat.slug || cat.id || "").trim().toLowerCase();
+  const mapped = categoryNameMap[key];
+  if (mapped) return mapped[language];
+  return cat.name;
+}
 
 export const useCategories = () => {
   const [categories, setCategories] = useState<Category[]>([]);
