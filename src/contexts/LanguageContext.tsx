@@ -1077,6 +1077,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     document.documentElement.dir = dir;
     document.documentElement.lang = language;
     
+    // Update document title based on language
+    document.title = language === "ar" ? "دار الصفوة | مكتبة تعليمية" : "Dar Al Safwa | Educational Store";
+    
     // Store in cache for offline support
     const cache = {
       language,
