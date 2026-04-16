@@ -33,7 +33,8 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "nav.signIn": "تسجيل الدخول",
     "nav.getStarted": "ابدأ الآن",
     "nav.signOut": "تسجيل الخروج",
-    "nav.admin": "لوحة التحكم",
+    "nav.admin": "لوحة تحكم الأدمن",
+    "nav.myOrdersStatus": "حالة طلباتي",
     
     // Top bar
     "top.printing": "خدمات الطباعة",
@@ -550,6 +551,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "nav.getStarted": "Get Started",
     "nav.signOut": "Sign Out",
     "nav.admin": "Admin Dashboard",
+    "nav.myOrdersStatus": "My Orders Status",
     
     // Top bar
     "top.printing": "Printing Services",

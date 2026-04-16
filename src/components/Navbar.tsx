@@ -45,7 +45,7 @@ const HighlightText = ({ text, query }: { text: string; query: string }) => {
 
 const Navbar = () => {
   const { t } = useLanguage();
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -157,7 +157,7 @@ const Navbar = () => {
                             <>
                               {[
                                 { label: t("nav.account") as string, icon: User, to: "/dashboard" },
-                                { label: t("nav.orders") as string, icon: ShoppingCart, to: "/my-orders" },
+                                ...(!isAdmin ? [{ label: t("nav.orders") as string, icon: ShoppingCart, to: "/my-orders" }] : []),
                                 { label: t("nav.wishlist") as string, icon: Heart, to: "/dashboard?tab=wishlist" },
                               ].map((item) => (
                                 <Link
@@ -275,14 +275,16 @@ const Navbar = () => {
                 >
                   {t("top.printing") as string}
                 </Link>
-                <Link 
-                  to="/my-orders" 
-                  className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
-                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-emerald-600 hover:bg-emerald-50"
-                  }`}
-                >
-                  حالة طلباتي
-                </Link>
+                {!isAdmin && (
+                  <Link 
+                    to="/my-orders" 
+                    className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
+                      isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-emerald-600 hover:bg-emerald-50"
+                    }`}
+                  >
+                    {t("nav.myOrdersStatus") as string}
+                  </Link>
+                )}
               </nav>
 
               {/* RIGHT: Logo (Rightmost in RTL) */}
