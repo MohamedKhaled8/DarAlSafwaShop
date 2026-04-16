@@ -76,10 +76,10 @@ const DarAlSafwaHero = () => {
                transition={{ duration: 0.8 }}
             >
               <h1 className="text-5xl md:text-8xl font-black text-white mb-6 drop-shadow-2xl">
-                دار الصفوة
+                {t("app.name") as string}
               </h1>
               <p className="text-xl md:text-3xl font-medium text-white/90 max-w-3xl mx-auto drop-shadow-md leading-relaxed">
-                وجهتكم المتكاملة للمستلزمات المكتبية، الكتب، والهدايا الاستثنائية
+                {t("hero.description") as string}
               </p>
             </motion.div>
           </div>
@@ -234,11 +234,11 @@ const HomePage = () => {
                   <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-none mb-1">
                     {t("home.flash.title") as string}
                   </h2>
-                  <p className="text-sm font-medium text-gray-400">عروض مختارة بعناية اليوم</p>
+                  <p className="text-sm font-medium text-gray-400">{t("home.flash.subtitle") as string}</p>
                </div>
             </div>
             <Link to="/search?q=flash" className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 flex items-center gap-2 group transition-all">
-              <span className="border-b-2 border-transparent group-hover:border-indigo-600 pb-0.5">مشاهدة الكل</span>
+              <span className="border-b-2 border-transparent group-hover:border-indigo-600 pb-0.5">{t("category.viewAll") as string}</span>
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" />
             </Link>
           </div>
