@@ -2,21 +2,16 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Search, ShoppingCart, User, Menu, X, Heart,
-  BookOpen, GraduationCap, Laptop, Gamepad2, Gift,
-  Palette, PenTool, Printer, Sparkles, ChevronDown,
-  ArrowRight, MapPin, Phone, Mail, LogOut
+  BookOpen, Sparkles, Shield,
+  LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { useCartContext } from "@/contexts/CartContext";
-import { useCategories, useProducts } from "@/hooks/useProducts";
+import { useProducts } from "@/hooks/useProducts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { resolveCategoryName, resolveProductName } from "@/lib/localizedContent";
-
-const iconMap: Record<string, React.ElementType> = {
-  BookOpen, GraduationCap, Laptop, Gamepad2, Gift, Palette, PenTool,
-};
+import { resolveProductName } from "@/lib/localizedContent";
 
 // Dar Al Safwa Logo Component
 const DarAlSafwaLogo = () => (
@@ -54,13 +49,10 @@ const Navbar = () => {
   const [desktopSearchActive, setDesktopSearchActive] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const { cartCount, wishlist } = useCartContext();
-  const { categories } = useCategories();
   const { products: catalogProducts } = useProducts(120);
   const searchRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
-  const categoryRef = useRef<HTMLDivElement>(null);
   const { scrollY } = useScroll();
   const prevCartCount = useRef(cartCount);
   const [cartBounce, setCartBounce] = useState(false);
@@ -92,7 +84,6 @@ const Navbar = () => {
         setDesktopSearchActive(false);
       }
       if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false);
-      if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) setActiveCategory(null);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -148,7 +139,10 @@ const Navbar = () => {
             <div className={`flex flex-row items-center gap-6 transition-all duration-300 ${scrolled ? "h-16" : "h-20"}`}>
               
               {/* LEFT: Account & Icons (Leftmost in RTL) */}
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1 shrink-0 sm:gap-2">
+                <div className={isHome && !scrolled ? "[&_button]:text-white" : ""}>
+                  <LanguageSwitcher variant={isHome && !scrolled ? "onDark" : "default"} />
+                </div>
                 <div ref={userRef} className="relative">
                   <motion.button
                     whileTap={{ scale: 0.95 }}
@@ -226,77 +220,31 @@ const Navbar = () => {
                 </Link>
               </div>
 
-              {/* CENTER: Navigation Links */}
-              <nav className="hidden lg:flex items-center gap-2 shrink-0 justify-center px-2" ref={categoryRef}>
-                <Link 
-                  to="/" 
-                  className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
-                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-emerald-600 hover:bg-emerald-50"
+              {/* CENTER: Navigation Links (categories moved to home page) */}
+              <nav className="hidden shrink-0 items-center justify-center gap-2 px-2 lg:flex">
+                <Link
+                  to="/"
+                  className={`rounded-lg px-3 py-2 text-sm font-bold transition-all ${
+                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600"
                   }`}
                 >
                   {t("nav.home") as string}
                 </Link>
-                <div className="relative">
-                  <button 
-                    onClick={() => setActiveCategory(activeCategory ? null : "categories")}
-                    className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-bold transition-all ${
-                      isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-emerald-600 hover:bg-emerald-50"
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold transition-all ${
+                      isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600"
                     }`}
                   >
-                    {t("nav.categories") as string}
-                    <ChevronDown className={`w-4 h-4 transition-transform ${activeCategory === "categories" ? "rotate-180" : ""}`} />
-                  </button>
-                  {/* Categories Dropdown Panel */}
-                  <AnimatePresence>
-                    {activeCategory === "categories" && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.97 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full mt-2 start-0 w-64 min-w-[12rem] max-w-[min(18rem,calc(100vw-2rem))] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-visible z-[9999]"
-                      >
-                      <div className="p-2">
-                        {categories.filter(c => c?.id).length === 0 ? (
-                          <p className="text-sm text-slate-400 text-center py-4">{t("nav.noCategories") as string}</p>
-                        ) : (
-                          categories.filter(c => c?.id).map((cat) => {
-                            const Icon = iconMap[cat.icon] || BookOpen;
-                            return (
-                              <Link
-                                key={cat.id}
-                                to={`/category/${cat.slug || cat.id}`}
-                                onClick={() => setActiveCategory(null)}
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-50 transition-colors"
-                              >
-                                <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
-                                  <Icon className="w-4 h-4 text-emerald-600" />
-                                </div>
-                                <div>
-                                  <span className="text-sm font-bold text-slate-700">{resolveCategoryName(cat, language)}</span>
-                                  {cat.count > 0 && <span className="text-xs text-slate-400 ms-2">({cat.count})</span>}
-                                </div>
-                              </Link>
-                            );
-                          })
-                        )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                </div>
-                <Link 
-                  to="/printing" 
-                  className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
-                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-emerald-600 hover:bg-emerald-50"
-                  }`}
-                >
-                  {t("top.printing") as string}
-                </Link>
-                <Link 
+                    <Shield className="h-4 w-4" />
+                    {t("nav.admin") as string}
+                  </Link>
+                )}
+                <Link
                   to={isAdmin ? "/admin/orders" : "/my-orders"}
-                  className={`px-3 py-2 rounded-lg text-sm font-bold transition-all ${
-                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:text-emerald-600 hover:bg-emerald-50"
+                  className={`rounded-lg px-3 py-2 text-sm font-bold transition-all ${
+                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600"
                   }`}
                 >
                   {isAdmin ? (t("admin.orders") as string) : (t("nav.myOrdersStatus") as string)}
@@ -502,49 +450,30 @@ const Navbar = () => {
                   {t("nav.home") as string}
                 </Link>
 
-                <p className="text-xs font-medium text-slate-400 uppercase px-4 pt-4 pb-2">
-                  {t("nav.categories") as string}
-                </p>
-                {categories.filter(c => c?.id).map((cat, i) => {
-                  const Icon = iconMap[cat.icon] || BookOpen;
-                  return (
-                    <motion.div
-                      key={cat.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                    >
-                      <Link
-                        to={`/category/${cat.slug || cat.id}`}
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors"
-                      >
-                        <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-emerald-600" />
-                        </div>
-                        <span className="text-slate-700">{resolveCategoryName(cat, language)}</span>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-
-                <div className="pt-4 border-t border-slate-100 space-y-2">
+                {isAdmin && (
                   <Link
-                    to="/printing"
+                    to="/admin"
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl bg-slate-900 text-white font-medium"
                   >
-                    <Printer className="w-5 h-5 text-slate-500" />
-                    <span className="text-slate-700">{t("top.printing") as string}</span>
+                    <Shield className="w-5 h-5" />
+                    {t("nav.admin") as string}
                   </Link>
+                )}
+
+                <div className="space-y-2 border-t border-slate-100 pt-4">
                   <Link
                     to="/gifts"
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50"
                   >
-                    <Sparkles className="w-5 h-5 text-slate-500" />
+                    <Sparkles className="h-5 w-5 text-slate-500" />
                     <span className="text-slate-700">{t("top.gifts") as string}</span>
                   </Link>
+                  <div className="px-2 pt-2">
+                    <p className="mb-2 px-2 text-xs font-medium uppercase text-slate-400">{t("nav.language") as string}</p>
+                    <LanguageSwitcher variant="default" />
+                  </div>
                 </div>
 
                 <div className="pt-4 border-t border-slate-100">

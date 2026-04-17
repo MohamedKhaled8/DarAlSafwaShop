@@ -13,6 +13,7 @@ import { getOrdersByCustomer } from "@/services/orderService";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { resolveProductName } from "@/lib/localizedContent";
+import { localizedOrderStatus } from "@/lib/orderLabels";
 
 const DashboardPage = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -184,18 +185,57 @@ const DashboardPage = () => {
                     <Link to="/" className="text-sm text-primary font-medium hover:underline">{(t("hero.shopNow") as string)}</Link>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {userOrders.map(order => (
-                      <div key={order.id} className="flex items-center justify-between p-4 bg-card rounded-xl border border-border">
-                        <div>
-                          <p className="text-sm font-medium">#{order.id.slice(-6).toUpperCase()}</p>
-                          <p className="text-xs text-muted-foreground">{formatDate(order.createdAt)} · {order.items?.length || 0} {t("common.items") as string}</p>
+                  <div className="space-y-4">
+                    {userOrders.map((order) => (
+                      <div key={order.id} className="overflow-hidden rounded-xl border border-border bg-card">
+                        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
+                          <div>
+                            <p className="text-[10px] font-semibold uppercase text-muted-foreground">
+                              {t("orders.refLabel") as string}
+                            </p>
+                            <p className="font-mono text-sm font-bold" dir="ltr">
+                              ···{order.id.slice(-8).toUpperCase()}
+                            </p>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {formatDate(order.createdAt)} · {order.items?.length || 0} {t("common.items") as string}
+                            </p>
+                          </div>
+                          <div className="text-end">
+                            <p className="text-lg font-black tabular-nums">
+                              {order.total?.toFixed(2) || "0.00"} {t("currency") as string}
+                            </p>
+                            <span className={`mt-1 inline-block text-xs font-medium ${getStatusColor(order.status)} rounded-full px-2 py-0.5`}>
+                              {localizedOrderStatus(order.status, t)}
+                            </span>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-bold tabular-nums">{order.total?.toFixed(2) || "0.00"} {t("currency") as string}</p>
-                          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusColor(order.status)}`}>
-                            {order.status}
-                          </span>
+                        <div className="space-y-2 p-4">
+                          {(order.items || []).slice(0, 5).map((item: { name: string; image?: string; quantity: number; price: number }, idx: number) => (
+                            <div key={idx} className="flex gap-3 rounded-lg border border-border/60 bg-muted/30 p-2">
+                              <img
+                                src={item.image || "/print-order.svg"}
+                                alt=""
+                                className="h-12 w-12 shrink-0 rounded-md object-cover"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p className="line-clamp-2 text-sm font-semibold">{item.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  ×{item.quantity} · {Number(item.price).toFixed(2)} {t("currency") as string}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                          {(order.items?.length || 0) > 5 && (
+                            <p className="text-center text-xs text-muted-foreground">+{order.items.length - 5}</p>
+                          )}
+                        </div>
+                        <div className="border-t border-border p-3">
+                          <Link
+                            to={`/invoice/${order.id}`}
+                            className="block w-full rounded-lg border border-border py-2 text-center text-sm font-bold hover:bg-muted"
+                          >
+                            {t("dashboard.viewInvoice") as string}
+                          </Link>
                         </div>
                       </div>
                     ))}

@@ -3,15 +3,10 @@ import { Home, Grid3X3, ShoppingCart, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCartContext } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useCategories } from "@/hooks/useProducts";
-
 const MobileNav = () => {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const { cartCount } = useCartContext();
   const { t } = useLanguage();
-  const { categories } = useCategories();
-  const firstCat = categories.find(c => c?.id);
-  const categoryPath = firstCat ? `/category/${firstCat.slug || firstCat.id}` : "/";
 
   const links: Array<{
     to: string;
@@ -21,7 +16,7 @@ const MobileNav = () => {
     categoryTab?: boolean;
   }> = [
     { to: "/", icon: Home, label: t("nav.home") as string },
-    { to: categoryPath, icon: Grid3X3, label: t("nav.categories") as string, categoryTab: true },
+    { to: "/#categories-strip", icon: Grid3X3, label: t("nav.categories") as string, categoryTab: true },
     { to: "/cart", icon: ShoppingCart, label: t("nav.cart") as string, badge: cartCount },
     { to: "/dashboard", icon: User, label: t("nav.account") as string },
   ];
@@ -33,10 +28,21 @@ const MobileNav = () => {
           {links.map(l => {
             const active =
               "categoryTab" in l && l.categoryTab
-                ? pathname.startsWith("/category")
+                ? pathname === "/" && hash === "#categories-strip"
                 : pathname === l.to;
             return (
-              <Link key={l.label + l.to} to={l.to} className="flex flex-col items-center gap-1 relative px-4 py-1">
+              <Link
+                key={l.label + l.to}
+                to={l.to}
+                onClick={(e) => {
+                  if ("categoryTab" in l && l.categoryTab && pathname === "/") {
+                    e.preventDefault();
+                    document.getElementById("categories-strip")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    window.history.replaceState(null, "", "#categories-strip");
+                  }
+                }}
+                className="relative flex flex-col items-center gap-1 px-4 py-1"
+              >
                 <motion.div
                   whileTap={{ scale: 0.85 }}
                   className={`p-1.5 rounded-xl transition-colors duration-300 ${active ? "bg-primary/10" : ""}`}

@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCartContext } from "@/contexts/CartContext";
 import { usePrintPricing } from "@/hooks/usePrintPricing";
 import { toast } from "sonner";
+import { compressImageFileToDataUrl } from "@/utils/imageCompress";
 
 const PRINT_ORDER_IMAGE = "/print-order.svg";
 
@@ -20,7 +21,9 @@ const PrintingPage = () => {
   const [print, setPrint] = useState<(typeof printModes)[number]>("Black & White");
   const [copies, setCopies] = useState(1);
   const [fileName, setFileName] = useState("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [addingToCart, setAddingToCart] = useState(false);
   const previewUrlRef = useRef<string | null>(null);
 
   const sizes = config?.paperSizes ?? [];
@@ -104,7 +107,10 @@ const PrintingPage = () => {
                   const file = e.target.files?.[0];
                   if (file) {
                     setFileName(file.name);
+                    setUploadedFile(file);
                     setPreviewFromFile(file);
+                  } else {
+                    setUploadedFile(null);
                   }
                   e.target.value = "";
                 }}
@@ -240,32 +246,48 @@ const PrintingPage = () => {
               </div>
               <button
                 type="button"
+                disabled={addingToCart}
                 onClick={() => {
-                  if (!fileName) {
-                    toast.error(isRTL ? "يرجى رفع الملف المراد طباعته أولاً" : "Please upload a file first");
-                    return;
-                  }
-                  if (!selectedSize || !selectedType) {
-                    toast.error(isRTL ? "تعذر تحميل أسعار الطباعة" : "Print pricing not loaded");
-                    return;
-                  }
-                  const sizeLabel = labelOf(selectedSize.labelAr, selectedSize.labelEn);
-                  const typeLabel = labelOf(selectedType.labelAr, selectedType.labelEn);
-                  addToCart({
-                    id: `print-${Date.now()}`,
-                    name: `${isRTL ? "طباعة" : "Print"}: ${fileName} (${sizeLabel} · ${typeLabel})`,
-                    price: parseFloat(total),
-                    image: PRINT_ORDER_IMAGE,
-                    variantId: `sizeId:${selectedSize.id}|typeId:${selectedType.id}|print:${print}|copies:${copies}`,
-                  });
-                  toast.success(isRTL ? "تم إضافة طلب الطباعة للسلة بنجاح" : "Printing order added to cart");
-                  setFileName("");
-                  setPreviewFromFile(null);
-                  setCopies(1);
+                  void (async () => {
+                    if (!fileName || !uploadedFile) {
+                      toast.error(isRTL ? "يرجى رفع الملف المراد طباعته أولاً" : "Please upload a file first");
+                      return;
+                    }
+                    if (!selectedSize || !selectedType) {
+                      toast.error(isRTL ? "تعذر تحميل أسعار الطباعة" : "Print pricing not loaded");
+                      return;
+                    }
+                    try {
+                      setAddingToCart(true);
+                      let imageUrl = PRINT_ORDER_IMAGE;
+                      if (uploadedFile.type.startsWith("image/")) {
+                        const dataUrl = await compressImageFileToDataUrl(uploadedFile, 520, 0.82);
+                        if (dataUrl) imageUrl = dataUrl;
+                      }
+                      const sizeLabel = labelOf(selectedSize.labelAr, selectedSize.labelEn);
+                      const typeLabel = labelOf(selectedType.labelAr, selectedType.labelEn);
+                      addToCart({
+                        id: `print-${Date.now()}`,
+                        name: `${isRTL ? "طباعة" : "Print"}: ${fileName} (${sizeLabel} · ${typeLabel})`,
+                        price: parseFloat(total),
+                        image: imageUrl,
+                        variantId: `sizeId:${selectedSize.id}|typeId:${selectedType.id}|print:${print}|copies:${copies}`,
+                      });
+                      toast.success(isRTL ? "تم إضافة طلب الطباعة للسلة بنجاح" : "Printing order added to cart");
+                      setFileName("");
+                      setUploadedFile(null);
+                      setPreviewFromFile(null);
+                      setCopies(1);
+                    } catch {
+                      toast.error(isRTL ? "تعذر معالجة الصورة" : "Could not process the image");
+                    } finally {
+                      setAddingToCart(false);
+                    }
+                  })();
                 }}
-                className="btn-press mt-4 w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+                className="btn-press mt-4 w-full rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-60"
               >
-                {(t("printing.placeOrder") as string) || "Add to Cart"}
+                {addingToCart ? (t("loading") as string) : ((t("printing.placeOrder") as string) || "Add to Cart")}
               </button>
             </div>
           </motion.div>

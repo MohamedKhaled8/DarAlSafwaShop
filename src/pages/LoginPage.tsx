@@ -49,7 +49,7 @@ const LoginPage = () => {
         }
       }
 
-      toast.success(t("login.welcomeBack") as string || "أهلاً بعودتك!");
+      toast.success((t("login.welcomeBack") as string) || (isRTL ? "تم تسجيل الدخول بنجاح!" : "Signed in successfully!"));
       
       // Delay navigation slightly so AuthContext can finish its state updates properly
       setTimeout(() => {
@@ -186,9 +186,9 @@ const LoginPage = () => {
 
                 <div className="text-center pt-8">
                   <p className="text-slate-500 text-sm">
-                    {t("login.noAccount") as string || "ليس لديك حساب؟"}{" "}
+                    {(t("login.noAccount") as string) || (isRTL ? "ليس لديك حساب؟" : "Don't have an account?")}{" "}
                     <Link to="/register" className="font-bold text-slate-900 hover:underline decoration-2 underline-offset-4">
-                      {isRTL ? "إنشاء حساب جديد" : "Create Account"}
+                      {(t("login.createAccount") as string) || (isRTL ? "إنشاء حساب" : "Create account")}
                     </Link>
                   </p>
                 </div>

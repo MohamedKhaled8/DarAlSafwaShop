@@ -194,8 +194,11 @@ const HomePage = () => {
         <DarAlSafwaHero />
       </section>
 
-      {/* ═══ CATEGORIES (no whileInView: avoids invisible strip when data loads after IO ran) ═══ */}
-      <section className="section-padding py-10">
+      {/* ═══ CATEGORIES (moved from navbar — first strip under hero) ═══ */}
+      <section id="categories-strip" className="section-padding scroll-mt-24 pb-10 pt-4">
+        <div className="mb-4 flex items-end justify-between gap-4 px-1">
+          <h2 className="text-lg font-extrabold text-gray-900 md:text-xl">{t("home.categoriesStripTitle") as string}</h2>
+        </div>
         {categoriesLoading ? (
           <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-1" aria-busy="true">
             {Array.from({ length: 8 }).map((_, i) => (
