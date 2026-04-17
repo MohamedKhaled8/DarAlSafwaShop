@@ -20,6 +20,11 @@ service cloud.firestore {
       allow create, update, delete: if signedIn();
     }
 
+    match /printPricing/{docId} {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
+    }
+
     match /orders/{docId} {
       allow read: if true;
       allow create: if signedIn() && request.resource.data.customerId == request.auth.uid;

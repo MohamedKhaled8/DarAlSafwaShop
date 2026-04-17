@@ -12,6 +12,7 @@ import { usePrintOrderManagement, usePrintOrderStats } from "@/hooks/usePrintOrd
 import { type PrintOrder, type PrintOrderStatus } from "@/services/printService";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import PrintPricingSettings from "@/pages/admin/PrintPricingSettings";
 
 const statusColor: Record<PrintOrderStatus, string> = {
   Printing: "bg-blue-500/10 text-blue-600",
@@ -79,6 +80,8 @@ const AdminPrintingPage = () => {
         <h1 className="text-2xl font-bold">{t("adminPrinting.title") as string}</h1>
         <p className="text-sm text-muted-foreground">{t("adminPrinting.subtitle") as string}</p>
       </div>
+
+      <PrintPricingSettings />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {statCards.map(s => (

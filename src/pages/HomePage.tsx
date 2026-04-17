@@ -194,43 +194,35 @@ const HomePage = () => {
         <DarAlSafwaHero />
       </section>
 
-      {/* ═══ CATEGORIES ═══ */}
-      <section className="section-padding py-10 overflow-hidden">
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-          variants={{
-            visible: { transition: { staggerChildren: 0.05 } },
-            hidden: {}
-          }}
-          className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-1"
-        >
-          {categories.map((c, i) => (
-            <motion.div
-              key={c.id}
-              variants={{
-                hidden: { opacity: 0, x: 20 },
-                visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 200, damping: 20 } }
-              }}
-            >
+      {/* ═══ CATEGORIES (no whileInView: avoids invisible strip when data loads after IO ran) ═══ */}
+      <section className="section-padding py-10">
+        {categoriesLoading ? (
+          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-1" aria-busy="true">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="h-[76px] min-w-[160px] shrink-0 animate-pulse rounded-2xl bg-muted" />
+            ))}
+          </div>
+        ) : categories.length > 0 ? (
+          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-1">
+            {categories.map((c) => (
               <Link
+                key={c.id}
                 to={`/category/${c.slug || c.id}`}
-                className="flex items-center gap-3 min-w-[160px] px-5 py-4 rounded-2xl bg-white border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_24px_rgba(67,56,202,0.08)] hover:-translate-y-1 transition-all duration-500 group"
+                className="group flex min-w-[160px] shrink-0 items-center gap-3 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(67,56,202,0.08)]"
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 bg-gray-50 group-hover:bg-indigo-50 transition-colors duration-500">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-2xl transition-colors duration-300 group-hover:bg-indigo-50">
                   {catEmoji[c.id] || "📦"}
                 </div>
                 <div>
-                  <span className="text-sm font-bold text-gray-800 group-hover:text-indigo-600 whitespace-nowrap transition-colors block">
+                  <span className="block whitespace-nowrap text-sm font-bold text-gray-800 transition-colors group-hover:text-indigo-600">
                     {resolveCategoryName(c, language)}
                   </span>
                   <span className="text-[10px] font-semibold text-gray-400">{t("category.browseNow") as string}</span>
                 </div>
               </Link>
-            </motion.div>
-          ))}
-        </motion.div>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       {/* ═══ FLASH DEALS ═══ */}
