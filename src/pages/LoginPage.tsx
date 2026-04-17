@@ -5,6 +5,7 @@ import { Loader2, Mail, Eye, EyeOff, LogIn } from "lucide-react";
 import { toast } from "sonner";
 import { loginUser, getUserProfile } from "@/services/authService";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const LoginPage = () => {
   const { t, isRTL } = useLanguage();
@@ -67,10 +68,13 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#f4f4f5] p-4 sm:p-6 lg:p-12 relative overflow-hidden">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4f4f5] p-4 text-foreground sm:p-6 lg:p-12 dark:bg-background">
+      <div className="absolute end-4 top-4 z-20">
+        <ThemeSwitcher variant="default" />
+      </div>
       {/* Decorative blurred background shapes */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-400/20 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-400/20 blur-[120px] pointer-events-none" />
+      <div className="pointer-events-none absolute left-[-10%] top-[-10%] h-[40%] w-[40%] rounded-full bg-blue-400/20 blur-[120px] dark:bg-primary/10" />
+      <div className="pointer-events-none absolute bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-indigo-400/20 blur-[120px] dark:bg-violet-500/10" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -78,7 +82,7 @@ const LoginPage = () => {
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="w-full max-w-6xl z-10"
       >
-        <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[650px] border border-white">
+        <div className="flex min-h-[650px] flex-col overflow-hidden rounded-[2.5rem] border border-white bg-white/80 shadow-2xl backdrop-blur-xl dark:border-border dark:bg-card/95 lg:flex-row">
           
           {/* IMAGE SIDE */}
           <div className="relative w-full lg:w-1/2 min-h-[300px] lg:min-h-full">
@@ -110,14 +114,14 @@ const LoginPage = () => {
           </div>
 
           {/* FORM SIDE */}
-          <div className="w-full lg:w-1/2 p-8 sm:p-12 lg:p-20 flex flex-col justify-center bg-white">
-            <div className="w-full max-w-md mx-auto" dir={isRTL ? "rtl" : "ltr"}>
+          <div className="flex w-full flex-col justify-center bg-white p-8 sm:p-12 lg:w-1/2 lg:p-20 dark:bg-card">
+            <div className="mx-auto w-full max-w-md" dir={isRTL ? "rtl" : "ltr"}>
               
-              <div className="mb-10 lg:mb-14 text-center lg:text-start" dir={isRTL ? "rtl" : "ltr"}>
-                <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">
+              <div className="mb-10 text-center lg:mb-14 lg:text-start" dir={isRTL ? "rtl" : "ltr"}>
+                <h2 className="mb-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-card-foreground">
                   {t("login.title") as string || "مرحباً بك مجدداً"}
                 </h2>
-                <p className="text-slate-500 text-base">
+                <p className="text-base text-slate-500 dark:text-muted-foreground">
                   {t("login.subtitle") as string || "سجل دخولك لمتابعة التسوق"}
                 </p>
               </div>
@@ -126,17 +130,17 @@ const LoginPage = () => {
                 
                 {/* Email Field */}
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">{t("login.email") as string}</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
-                      <Mail size={18} className="group-focus-within:text-slate-900 transition-colors" />
+                  <label className="text-sm font-semibold text-slate-700 dark:text-foreground">{t("login.email") as string}</label>
+                  <div className="group relative">
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 dark:text-muted-foreground">
+                      <Mail size={18} className="transition-colors group-focus-within:text-slate-900 dark:group-focus-within:text-primary" />
                     </div>
                     <input
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className={`w-full h-14 pr-11 pl-4 rounded-xl border bg-slate-50 text-slate-900 text-base transition-all duration-300 outline-none
-                        ${errors.email ? "border-red-300 focus:border-red-500 bg-red-50/30" : "border-slate-200 focus:border-slate-900 hover:border-slate-300"}`}
+                      className={`h-14 w-full rounded-xl border bg-slate-50 pl-4 pr-11 text-base text-slate-900 outline-none transition-all duration-300 dark:bg-muted/50 dark:text-foreground dark:placeholder:text-muted-foreground
+                        ${errors.email ? "border-red-300 bg-red-50/30 focus:border-red-500 dark:bg-red-950/20" : "border-slate-200 hover:border-slate-300 focus:border-slate-900 dark:border-border dark:hover:border-muted-foreground/40 dark:focus:border-primary"}`}
                       placeholder={isRTL ? "البريد الإلكتروني" : "Email address"}
                       dir="ltr"
                     />
@@ -147,25 +151,25 @@ const LoginPage = () => {
                 {/* Password Field */}
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <label className="text-sm font-semibold text-slate-700">{t("login.password") as string}</label>
-                    <a href="#" className="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-foreground">{t("login.password") as string}</label>
+                    <a href="#" className="text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 dark:text-muted-foreground dark:hover:text-foreground">
                       {t("login.forgotPassword") as string || "نسيت كلمة السر؟"}
                     </a>
                   </div>
-                  <div className="relative group">
+                  <div className="group relative">
                     <input
                       type={showPassword ? "text" : "password"}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className={`w-full h-14 pl-11 pr-4 rounded-xl border bg-slate-50 text-slate-900 text-base transition-all duration-300 outline-none
-                        ${errors.password ? "border-red-300 focus:border-red-500 bg-red-50/30" : "border-slate-200 focus:border-slate-900 hover:border-slate-300"}`}
+                      className={`h-14 w-full rounded-xl border bg-slate-50 pl-11 pr-4 text-base text-slate-900 outline-none transition-all duration-300 dark:bg-muted/50 dark:text-foreground dark:placeholder:text-muted-foreground
+                        ${errors.password ? "border-red-300 bg-red-50/30 focus:border-red-500 dark:bg-red-950/20" : "border-slate-200 hover:border-slate-300 focus:border-slate-900 dark:border-border dark:hover:border-muted-foreground/40 dark:focus:border-primary"}`}
                       placeholder="••••••••"
                       dir="ltr"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400 hover:text-slate-900 transition-colors"
+                      className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors hover:text-slate-900 dark:hover:text-foreground"
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -177,7 +181,7 @@ const LoginPage = () => {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-14 bg-slate-900 text-white font-bold text-base rounded-xl hover:bg-slate-800 transition-all duration-300 active:scale-[0.99] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg shadow-slate-900/10"
+                    className="flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-slate-900 text-base font-bold text-white shadow-lg shadow-slate-900/10 transition-all duration-300 hover:bg-slate-800 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70 dark:bg-primary dark:shadow-primary/20 dark:hover:bg-primary/90"
                   >
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (isRTL ? "تسجيل الدخول" : "Sign In")}
                     {!loading && <LogIn size={18} className={isRTL ? "rotate-0" : "rotate-180"} />}
@@ -185,9 +189,9 @@ const LoginPage = () => {
                 </div>
 
                 <div className="text-center pt-8">
-                  <p className="text-slate-500 text-sm">
+                  <p className="text-sm text-slate-500 dark:text-muted-foreground">
                     {(t("login.noAccount") as string) || (isRTL ? "ليس لديك حساب؟" : "Don't have an account?")}{" "}
-                    <Link to="/register" className="font-bold text-slate-900 hover:underline decoration-2 underline-offset-4">
+                    <Link to="/register" className="font-bold text-slate-900 underline decoration-2 underline-offset-4 hover:underline dark:text-primary">
                       {(t("login.createAccount") as string) || (isRTL ? "إنشاء حساب" : "Create account")}
                     </Link>
                   </p>
@@ -198,7 +202,7 @@ const LoginPage = () => {
           </div>
         </div>
         
-        <p className="text-center text-xs font-semibold text-slate-400 mt-8 tracking-wider uppercase">
+        <p className="mt-8 text-center text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-muted-foreground">
           © 2026 {(t("app.name") as string) || "Dar Al Safwa"} 
         </p>
       </motion.div>
