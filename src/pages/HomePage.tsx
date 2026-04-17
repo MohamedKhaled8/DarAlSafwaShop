@@ -114,8 +114,8 @@ const DarAlSafwaHero = () => {
 
         <div className="absolute -bottom-8 left-0 right-0 z-30 px-6">
           <form onSubmit={handleSearch} className="max-w-4xl mx-auto">
-            <div className="flex flex-row-reverse items-center overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,0,0,0.15)] ring-1 ring-black/5 transition-all duration-300">
-              <button type="submit" className="shrink-0 bg-slate-900 p-5 text-white transition-all hover:bg-violet-600 md:p-6">
+            <div className="flex flex-row-reverse items-center overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,0,0,0.15)] ring-1 ring-black/5 transition-all duration-300 dark:bg-card dark:shadow-[0_20px_40px_rgba(0,0,0,0.45)] dark:ring-white/10">
+              <button type="submit" className="shrink-0 bg-slate-900 p-5 text-white transition-all hover:bg-violet-600 md:p-6 dark:bg-primary dark:hover:bg-primary/90">
                 <Search className="w-7 h-7 md:w-9 md:h-9" />
               </button>
               <input
@@ -123,7 +123,7 @@ const DarAlSafwaHero = () => {
                 placeholder={t("nav.searchPlaceholder") as string}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full min-w-0 bg-transparent px-8 py-5 md:py-6 text-xl md:text-2xl font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none text-right"
+                className="w-full min-w-0 bg-transparent px-8 py-5 md:py-6 text-xl md:text-2xl font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none text-right dark:text-foreground dark:placeholder:text-muted-foreground"
               />
             </div>
           </form>
@@ -187,7 +187,7 @@ const HomePage = () => {
   const visibleProducts = showAll ? allProducts : allProducts.slice(0, 12);
 
   return (
-    <main className="bg-[#fcfdfe] min-h-screen pb-20 lg:pb-0">
+    <main className="min-h-screen bg-background pb-20 lg:pb-0">
 
       {/* ═══ DAR AL SAFWA HERO (Immersive Splash) ═══ */}
       <section className="w-full relative -mt-20">
@@ -197,7 +197,7 @@ const HomePage = () => {
       {/* ═══ CATEGORIES (moved from navbar — first strip under hero) ═══ */}
       <section id="categories-strip" className="section-padding scroll-mt-24 pb-10 pt-4">
         <div className="mb-4 flex items-end justify-between gap-4 px-1">
-          <h2 className="text-lg font-extrabold text-gray-900 md:text-xl">{t("home.categoriesStripTitle") as string}</h2>
+          <h2 className="text-lg font-extrabold text-gray-900 md:text-xl dark:text-foreground">{t("home.categoriesStripTitle") as string}</h2>
         </div>
         {categoriesLoading ? (
           <div className="min-h-[76px]" aria-hidden />
@@ -207,16 +207,16 @@ const HomePage = () => {
               <Link
                 key={c.id}
                 to={`/category/${c.slug || c.id}`}
-                className="group flex min-w-[160px] shrink-0 items-center gap-3 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(67,56,202,0.08)]"
+                className="group flex min-w-[160px] shrink-0 items-center gap-3 rounded-2xl border border-gray-100 bg-white px-5 py-4 shadow-[0_4px_12px_rgba(0,0,0,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_rgba(67,56,202,0.08)] dark:border-border dark:bg-card dark:hover:shadow-[0_12px_24px_rgba(99,102,241,0.12)]"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-2xl transition-colors duration-300 group-hover:bg-indigo-50">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-2xl transition-colors duration-300 group-hover:bg-indigo-50 dark:bg-muted dark:group-hover:bg-primary/15">
                   {catEmoji[c.id] || "📦"}
                 </div>
                 <div>
-                  <span className="block whitespace-nowrap text-sm font-bold text-gray-800 transition-colors group-hover:text-indigo-600">
+                  <span className="block whitespace-nowrap text-sm font-bold text-gray-800 transition-colors group-hover:text-indigo-600 dark:text-foreground dark:group-hover:text-primary">
                     {resolveCategoryName(c, language)}
                   </span>
-                  <span className="text-[10px] font-semibold text-gray-400">{t("category.browseNow") as string}</span>
+                  <span className="text-[10px] font-semibold text-gray-400 dark:text-muted-foreground">{t("category.browseNow") as string}</span>
                 </div>
               </Link>
             ))}
@@ -242,7 +242,7 @@ const HomePage = () => {
                   <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-none mb-1">
                     {t("home.flash.title") as string}
                   </h2>
-                  <p className="text-sm font-medium text-gray-400">{t("home.flash.subtitle") as string}</p>
+                  <p className="text-sm font-medium text-gray-400 dark:text-muted-foreground">{t("home.flash.subtitle") as string}</p>
                </div>
             </div>
             <Link to="/search?q=flash" className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 flex items-center gap-2 group transition-all">
@@ -268,9 +268,9 @@ const HomePage = () => {
             <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center">
               <TrendingUp className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-lg md:text-xl font-extrabold text-gray-900">{t("home.bestselling.title") as string}</h2>
+            <h2 className="text-lg md:text-xl font-extrabold text-gray-900 dark:text-foreground">{t("home.bestselling.title") as string}</h2>
           </div>
-          <Link to="/category/books" className="text-xs font-semibold text-indigo-600 hover:underline flex items-center gap-1">
+          <Link to="/category/books" className="text-xs font-semibold text-indigo-600 hover:underline flex items-center gap-1 dark:text-indigo-400">
             {t("category.viewAll") as string} <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -289,7 +289,7 @@ const HomePage = () => {
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
               <Package className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-lg md:text-xl font-extrabold text-gray-900">{t("home.cta.shopSale") as string}</h2>
+            <h2 className="text-lg md:text-xl font-extrabold text-gray-900 dark:text-foreground">{t("home.cta.shopSale") as string}</h2>
           </div>
         </div>
 
@@ -303,7 +303,7 @@ const HomePage = () => {
           <div className="text-center mt-8">
             <button
               onClick={() => setShowAll(true)}
-              className="px-8 py-3 rounded-full border-2 border-gray-200 text-gray-700 text-sm font-bold hover:border-indigo-600 hover:text-indigo-600 transition-colors"
+              className="px-8 py-3 rounded-full border-2 border-gray-200 text-gray-700 text-sm font-bold transition-colors hover:border-indigo-600 hover:text-indigo-600 dark:border-border dark:text-foreground dark:hover:border-primary dark:hover:text-primary"
             >
               {t("category.viewAll") as string} ({allProducts.length - 12}+)
             </button>

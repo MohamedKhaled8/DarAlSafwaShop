@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 
 const AdminLayout = () => {
   const location = useLocation();
@@ -46,6 +47,10 @@ const AdminLayout = () => {
 
       <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-800">
         <div className="px-4 py-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t("theme.label") as string}</p>
+          <div className="mb-4 flex justify-start">
+            <ThemeSwitcher variant="default" />
+          </div>
           <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{(t("language.title") as string) || "Language"}</p>
           <div className="flex gap-2">
             <button

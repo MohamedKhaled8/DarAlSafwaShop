@@ -11,6 +11,7 @@ import { useProducts } from "@/hooks/useProducts";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import { resolveProductName } from "@/lib/localizedContent";
 
 // Dar Al Safwa Logo Component
@@ -22,7 +23,7 @@ const DarAlSafwaLogo = () => (
     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 flex items-center justify-center shadow-lg shadow-emerald-200">
       <BookOpen className="w-5 h-5 text-white" />
     </div>
-    <span className="font-bold text-xl text-slate-800">دار الصفوة</span>
+    <span className="font-bold text-xl text-slate-800 dark:text-slate-100">دار الصفوة</span>
   </motion.div>
 );
 
@@ -124,7 +125,7 @@ const Navbar = () => {
       {/* Main Header - Clean White */}
       <motion.header
         className={`fixed left-0 right-0 top-0 z-40 transition-all duration-500 overflow-visible ${
-          isHome && !scrolled ? "bg-transparent" : "bg-white shadow-sm"
+          isHome && !scrolled ? "bg-transparent" : "bg-white shadow-sm dark:bg-gray-950 dark:shadow-black/20"
         }`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -132,7 +133,7 @@ const Navbar = () => {
       >
         <div 
           className={`transition-all duration-500 overflow-visible ${
-            isHome && !scrolled ? "bg-transparent border-transparent" : "bg-white border-b border-slate-100 shadow-sm"
+            isHome && !scrolled ? "bg-transparent border-transparent" : "bg-white border-b border-slate-100 shadow-sm dark:bg-gray-950 dark:border-slate-800"
           }`}
         >
           <div className="section-padding">
@@ -140,6 +141,9 @@ const Navbar = () => {
               
               {/* LEFT: Account & Icons (Leftmost in RTL) */}
               <div className="flex items-center gap-1 shrink-0 sm:gap-2">
+                <div className={isHome && !scrolled ? "[&_button]:text-white" : ""}>
+                  <ThemeSwitcher variant={isHome && !scrolled ? "onDark" : "default"} />
+                </div>
                 <div className={isHome && !scrolled ? "[&_button]:text-white" : ""}>
                   <LanguageSwitcher variant={isHome && !scrolled ? "onDark" : "default"} />
                 </div>
@@ -162,7 +166,7 @@ const Navbar = () => {
                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute start-0 top-full mt-2 w-56 min-w-[14rem] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 overflow-hidden z-[9999] origin-top-start"
+                        className="absolute start-0 top-full mt-2 w-56 min-w-[14rem] max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:border-slate-800 dark:bg-gray-950 overflow-hidden z-[9999] origin-top-start"
                       >
                         <div className="p-2">
                           {user ? (
@@ -210,7 +214,9 @@ const Navbar = () => {
                 <Link 
                   to="/cart" 
                   className={`relative p-2.5 rounded-full transition-all group ${
-                    isHome && !scrolled ? "bg-white/10 text-white hover:bg-white/20" : "bg-slate-100 text-slate-600 hover:bg-emerald-50"
+                    isHome && !scrolled
+                      ? "bg-white/10 text-white hover:bg-white/20"
+                      : "bg-slate-100 text-slate-600 hover:bg-emerald-50 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                   }`}
                 >
                   <ShoppingCart className="w-5 h-5" />
@@ -225,25 +231,29 @@ const Navbar = () => {
                 <Link
                   to="/"
                   className={`rounded-lg px-3 py-2 text-sm font-bold transition-all ${
-                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600"
+                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-emerald-400"
                   }`}
                 >
                   {t("nav.home") as string}
                 </Link>
-                <Link
-                  to="/printing"
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold transition-all ${
-                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600"
-                  }`}
-                >
-                  <Printer className="h-4 w-4" />
-                  {t("top.printing") as string}
-                </Link>
+                {!isAdmin && (
+                  <Link
+                    to="/printing"
+                    className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold transition-all ${
+                      isHome && !scrolled
+                        ? "text-white hover:bg-white/10"
+                        : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-emerald-400"
+                    }`}
+                  >
+                    <Printer className="h-4 w-4" />
+                    {t("top.printing") as string}
+                  </Link>
+                )}
                 {isAdmin && (
                   <Link
                     to="/admin"
                     className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold transition-all ${
-                      isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600"
+                      isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-emerald-400"
                     }`}
                   >
                     <Shield className="h-4 w-4" />
@@ -253,7 +263,7 @@ const Navbar = () => {
                 <Link
                   to={isAdmin ? "/admin/orders" : "/my-orders"}
                   className={`rounded-lg px-3 py-2 text-sm font-bold transition-all ${
-                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600"
+                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-emerald-400"
                   }`}
                 >
                   {isAdmin ? (t("admin.orders") as string) : (t("nav.myOrdersStatus") as string)}
@@ -282,7 +292,7 @@ const Navbar = () => {
                     className={`w-full rounded-full border py-2.5 ps-10 pe-4 text-sm font-medium outline-none transition-colors ${
                       isHome && !scrolled
                         ? "border-white/25 bg-white/15 text-white placeholder:text-white/70 focus:border-white/50 focus:bg-white/20"
-                        : "border-slate-200 bg-slate-50 text-slate-800 placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white"
+                        : "border-slate-200 bg-slate-50 text-slate-800 placeholder:text-slate-400 focus:border-emerald-400 focus:bg-white dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-emerald-500 dark:focus:bg-slate-900"
                     }`}
                   />
                   {desktopSearchActive && suggestions.length > 0 && (
@@ -319,7 +329,7 @@ const Navbar = () => {
                   whileHover={{ scale: 1.02 }}
                 >
                   <span className={`font-black text-xl transition-colors hidden md:block ${
-                    isHome && !scrolled ? "text-white" : "text-slate-800"
+                    isHome && !scrolled ? "text-white" : "text-slate-800 dark:text-slate-100"
                   }`}>{t("app.name") as string}</span>
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-lg transition-all ${
                     isHome && !scrolled ? "bg-white/10 backdrop-blur-md" : "bg-emerald-600 shadow-xl"
@@ -436,16 +446,16 @@ const Navbar = () => {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 left-0 bottom-0 z-[90] w-[300px] bg-white shadow-2xl lg:hidden overflow-y-auto"
+              className="fixed top-0 left-0 bottom-0 z-[90] w-[300px] overflow-y-auto bg-white shadow-2xl dark:bg-gray-950 dark:border-e dark:border-slate-800 lg:hidden"
             >
-              <div className="p-5 border-b border-slate-100">
+              <div className="border-b border-slate-100 p-5 dark:border-slate-800">
                 <div className="flex items-center justify-between">
                   <DarAlSafwaLogo />
                   <button 
                     onClick={() => setMenuOpen(false)}
-                    className="p-2 rounded-lg hover:bg-slate-100 transition-colors"
+                    className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
                   >
-                    <X className="w-5 h-5 text-slate-600" />
+                    <X className="h-5 w-5 text-slate-600 dark:text-slate-300" />
                   </button>
                 </div>
               </div>
@@ -454,18 +464,20 @@ const Navbar = () => {
                 <Link
                   to="/"
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-50 text-emerald-700 font-medium"
+                  className="flex items-center gap-3 rounded-xl bg-emerald-50 px-4 py-3 font-medium text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300"
                 >
                   {t("nav.home") as string}
                 </Link>
-                <Link
-                  to="/printing"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50"
-                >
-                  <Printer className="h-5 w-5 text-slate-500" />
-                  <span className="text-slate-700">{t("top.printing") as string}</span>
-                </Link>
+                {!isAdmin && (
+                  <Link
+                    to="/printing"
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+                  >
+                    <Printer className="h-5 w-5 text-slate-500" />
+                    <span className="text-slate-700 dark:text-slate-200">{t("top.printing") as string}</span>
+                  </Link>
+                )}
 
                 {isAdmin && (
                   <Link
@@ -478,22 +490,30 @@ const Navbar = () => {
                   </Link>
                 )}
 
-                <div className="space-y-2 border-t border-slate-100 pt-4">
+                <div className="space-y-2 border-t border-slate-100 pt-4 dark:border-slate-800">
                   <Link
                     to="/gifts"
                     onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50"
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
                   >
                     <Sparkles className="h-5 w-5 text-slate-500" />
-                    <span className="text-slate-700">{t("top.gifts") as string}</span>
+                    <span className="text-slate-700 dark:text-slate-200">{t("top.gifts") as string}</span>
                   </Link>
                   <div className="px-2 pt-2">
-                    <p className="mb-2 px-2 text-xs font-medium uppercase text-slate-400">{t("nav.language") as string}</p>
+                    <p className="mb-2 px-2 text-xs font-medium uppercase text-slate-400 dark:text-slate-500">
+                      {t("theme.label") as string}
+                    </p>
+                    <ThemeSwitcher variant="default" />
+                  </div>
+                  <div className="px-2 pt-2">
+                    <p className="mb-2 px-2 text-xs font-medium uppercase text-slate-400 dark:text-slate-500">
+                      {t("nav.language") as string}
+                    </p>
                     <LanguageSwitcher variant="default" />
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100">
+                <div className="border-t border-slate-100 pt-4 dark:border-slate-800">
                   {user ? (
                     <>
                       <Link
