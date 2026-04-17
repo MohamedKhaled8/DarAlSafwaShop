@@ -23,10 +23,10 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
     <motion.div
       initial={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, delay: index * 0.02 }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.08)]"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_2px_10px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_15px_40px_rgba(0,0,0,0.08)] dark:border-border dark:bg-card dark:shadow-[0_2px_10px_rgba(0,0,0,0.25)] dark:hover:shadow-[0_15px_40px_rgba(0,0,0,0.35)]"
     >
       {/* Image + badges + wishlist (heart outside Link so it toggles wishlist only) */}
-      <div className="relative aspect-square w-full overflow-hidden bg-slate-50">
+      <div className="relative aspect-square w-full overflow-hidden bg-slate-50 dark:bg-muted/40">
         <div className="absolute end-2 top-2 z-20 flex flex-col gap-1.5">
           {discount ? (
             <span className="rounded-lg bg-rose-500 px-2 py-1 text-[10px] font-black text-white shadow-md shadow-rose-100">
@@ -67,13 +67,13 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
       {/* Text block: full card area clickable except cart button */}
       <Link
         to={productUrl}
-        className="relative flex min-h-0 flex-1 flex-col bg-white p-3.5 text-inherit no-underline outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-primary"
+        className="relative flex min-h-0 flex-1 flex-col bg-white p-3.5 text-inherit no-underline outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-primary dark:bg-card"
       >
         <span className="mb-1 text-[10px] font-bold uppercase tracking-wider text-violet-600 opacity-70">
           {t("app.name") as string}
         </span>
 
-        <h3 className="mb-2 line-clamp-2 min-h-[2.8em] text-[13px] font-bold leading-snug text-slate-800 group-hover:text-violet-600">
+        <h3 className="mb-2 line-clamp-2 min-h-[2.8em] text-[13px] font-bold leading-snug text-slate-800 group-hover:text-violet-600 dark:text-card-foreground dark:group-hover:text-primary">
           {displayName}
         </h3>
 
@@ -83,12 +83,12 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
               <Star
                 key={i}
                 className={`w-3 h-3 ${
-                  i < Math.floor(product.rating) ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200"
+                  i < Math.floor(product.rating) ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-slate-600 dark:text-slate-600"
                 }`}
               />
             ))}
           </div>
-          <span className="text-[10px] font-bold text-slate-400">({product.reviews})</span>
+          <span className="text-[10px] font-bold text-slate-400 dark:text-muted-foreground">({product.reviews})</span>
         </div>
 
         <div className="relative mt-auto flex items-end justify-between gap-2 pe-11">
@@ -98,7 +98,7 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
                 {product.originalPrice?.toFixed(2)}
               </span>
             ) : null}
-            <span className="text-base font-black tracking-tight text-slate-900">
+            <span className="text-base font-black tracking-tight text-slate-900 dark:text-card-foreground">
               {product.price.toFixed(2)}{" "}
               <span className="text-[10px] font-bold text-violet-600">{t("currency") as string}</span>
             </span>

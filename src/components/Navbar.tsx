@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Search, ShoppingCart, User, Menu, X, Heart,
   BookOpen, Sparkles, Shield, Printer,
@@ -44,6 +44,7 @@ const Navbar = () => {
   const { t, language } = useLanguage();
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
@@ -118,7 +119,7 @@ const Navbar = () => {
     }
   };
 
-  const isHome = window.location.pathname === "/";
+  const isHome = pathname === "/";
 
   return (
     <>

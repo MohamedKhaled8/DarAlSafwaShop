@@ -10,7 +10,7 @@ const Footer = () => {
   const { categories } = useCategories();
 
   return (
-  <footer className="bg-foreground text-primary-foreground mt-16">
+  <footer className="mt-16 bg-slate-950 text-slate-50">
     <div className="section-padding py-12">
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
         <div>
@@ -57,8 +57,8 @@ const Footer = () => {
           </ul>
         </div>
       </div>
-      <div className="border-t border-primary-foreground/10 mt-10 pt-6 text-center">
-        <p className="text-xs opacity-40">© 2026 {t("app.name") as string}. {t("footer.rights") as string}</p>
+      <div className="mt-10 border-t border-white/10 pt-6 text-center">
+        <p className="text-xs text-slate-50/50">© 2026 {t("app.name") as string}. {t("footer.rights") as string}</p>
       </div>
     </div>
   </footer>
