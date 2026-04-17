@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Search, ShoppingCart, User, Menu, X, Heart,
-  BookOpen, Sparkles, Shield,
+  BookOpen, Sparkles, Shield, Printer,
   LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
@@ -111,7 +111,6 @@ const Navbar = () => {
     try {
       await logout();
       setUserOpen(false);
-      setMenuOpen(false);
       navigate("/login", { replace: true });
     } catch (error) {
       console.error("Logout failed:", error);
@@ -230,6 +229,15 @@ const Navbar = () => {
                   }`}
                 >
                   {t("nav.home") as string}
+                </Link>
+                <Link
+                  to="/printing"
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold transition-all ${
+                    isHome && !scrolled ? "text-white hover:bg-white/10" : "text-slate-700 hover:bg-emerald-50 hover:text-emerald-600"
+                  }`}
+                >
+                  <Printer className="h-4 w-4" />
+                  {t("top.printing") as string}
                 </Link>
                 {isAdmin && (
                   <Link
@@ -449,6 +457,14 @@ const Navbar = () => {
                   className="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-50 text-emerald-700 font-medium"
                 >
                   {t("nav.home") as string}
+                </Link>
+                <Link
+                  to="/printing"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50"
+                >
+                  <Printer className="h-5 w-5 text-slate-500" />
+                  <span className="text-slate-700">{t("top.printing") as string}</span>
                 </Link>
 
                 {isAdmin && (

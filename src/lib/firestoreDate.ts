@@ -1,25 +1,36 @@
-import type { Timestamp } from "firebase/firestore";
-
-/** Convert Firestore Timestamp, plain object, or ISO string to a JS Date. */
-export function firestoreToDate(value: unknown): Date | null {
+/** Convert Firestore Timestamp / serialized timestamp / ISO string to a valid Date. */
+export function firestoreTimestampToDate(value: unknown): Date | null {
   if (value == null) return null;
   if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
-  if (typeof value === "object" && value !== null && "toDate" in value && typeof (value as Timestamp).toDate === "function") {
-    const d = (value as Timestamp).toDate();
-    return Number.isNaN(d.getTime()) ? null : d;
+  if (typeof value === "object" && value !== null && typeof (value as { toDate?: () => Date }).toDate === "function") {
+    try {
+      const d = (value as { toDate: () => Date }).toDate();
+      return Number.isNaN(d.getTime()) ? null : d;
+    } catch {
+      return null;
+    }
   }
   const sec = (value as { seconds?: number })?.seconds;
   if (typeof sec === "number") return new Date(sec * 1000);
-  const d = new Date(value as string | number);
-  return Number.isNaN(d.getTime()) ? null : d;
+  const ms = (value as { _seconds?: number })?._seconds;
+  if (typeof ms === "number") return new Date(ms * 1000);
+  if (typeof value === "number") {
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  if (typeof value === "string") {
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  return null;
 }
 
 export function formatFirestoreDate(
   value: unknown,
   locale: string,
-  opts: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" },
+  options?: Intl.DateTimeFormatOptions,
 ): string {
-  const d = firestoreToDate(value);
+  const d = firestoreTimestampToDate(value);
   if (!d) return "—";
-  return new Intl.DateTimeFormat(locale === "ar" ? "ar-EG" : "en-US", opts).format(d);
+  return d.toLocaleString(locale, options ?? { dateStyle: "medium", timeStyle: "short" });
 }

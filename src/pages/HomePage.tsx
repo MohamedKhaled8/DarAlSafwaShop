@@ -200,11 +200,7 @@ const HomePage = () => {
           <h2 className="text-lg font-extrabold text-gray-900 md:text-xl">{t("home.categoriesStripTitle") as string}</h2>
         </div>
         {categoriesLoading ? (
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-1" aria-busy="true">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-[76px] min-w-[160px] shrink-0 animate-pulse rounded-2xl bg-muted" />
-            ))}
-          </div>
+          <div className="min-h-[76px]" aria-hidden />
         ) : categories.length > 0 ? (
           <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-1">
             {categories.map((c) => (
