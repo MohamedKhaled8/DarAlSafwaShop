@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Search, ShoppingCart, User, Menu, X, Heart,
   BookOpen, Sparkles, Shield, Printer,
+  PackageSearch,
   LogOut,
 } from "lucide-react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
@@ -469,6 +470,14 @@ const Navbar = () => {
                 >
                   {t("nav.home") as string}
                 </Link>
+                <Link
+                  to="/gifts"
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+                >
+                  <Sparkles className="h-5 w-5 text-slate-500" />
+                  <span className="text-slate-700 dark:text-slate-200">{t("top.gifts") as string}</span>
+                </Link>
                 {!isAdmin && (
                   <Link
                     to="/printing"
@@ -479,6 +488,14 @@ const Navbar = () => {
                     <span className="text-slate-700 dark:text-slate-200">{t("top.printing") as string}</span>
                   </Link>
                 )}
+                <Link
+                  to={user ? (isAdmin ? "/admin/orders" : "/my-orders") : `/login?redirect=${encodeURIComponent("/my-orders")}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
+                >
+                  <PackageSearch className="h-5 w-5 text-slate-500" />
+                  <span className="text-slate-700 dark:text-slate-200">{t("nav.trackOrders") as string}</span>
+                </Link>
 
                 {isAdmin && (
                   <Link
@@ -492,24 +509,12 @@ const Navbar = () => {
                 )}
 
                 <div className="space-y-2 border-t border-slate-100 pt-4 dark:border-slate-800">
-                  <Link
-                    to="/gifts"
-                    onClick={() => setMenuOpen(false)}
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800"
-                  >
-                    <Sparkles className="h-5 w-5 text-slate-500" />
-                    <span className="text-slate-700 dark:text-slate-200">{t("top.gifts") as string}</span>
-                  </Link>
-                  <div className="px-2 pt-2">
-                    <p className="mb-2 px-2 text-xs font-medium uppercase text-slate-400 dark:text-slate-500">
-                      {t("theme.label") as string}
-                    </p>
+                  <div className="flex items-center justify-between gap-3 rounded-xl px-2 py-2">
+                    <p className="px-2 text-sm font-semibold text-slate-600 dark:text-slate-300">{t("theme.label") as string}</p>
                     <ThemeSwitcher variant="default" />
                   </div>
-                  <div className="px-2 pt-2">
-                    <p className="mb-2 px-2 text-xs font-medium uppercase text-slate-400 dark:text-slate-500">
-                      {t("nav.language") as string}
-                    </p>
+                  <div className="flex items-center justify-between gap-3 rounded-xl px-2 py-2">
+                    <p className="px-2 text-sm font-semibold text-slate-600 dark:text-slate-300">{t("nav.language") as string}</p>
                     <LanguageSwitcher variant="default" />
                   </div>
                 </div>
