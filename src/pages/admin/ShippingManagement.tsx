@@ -9,6 +9,7 @@ import { useShippingRates } from "@/hooks/useShippingRates";
 import { shippingService } from "@/services/shippingService";
 import { toast } from "sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const EGYPT_GOVERNORATES = [
   "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر", "البحيرة", "الفيوم",
@@ -24,7 +25,12 @@ const ShippingManagement = () => {
   const [formData, setFormData] = useState({ name: "", rate: 0, isActive: true });
   const [actionLoading, setActionLoading] = useState(false);
   
-  const { rates, loading, refetch } = useShippingRates();
+  const { rates, loading, error, refetch } = useShippingRates();
+
+  const shippingErrText = (err: unknown) => {
+    const m = err instanceof Error ? err.message : String(err);
+    return m === "SHIPPING_FIRESTORE_PERMISSION" ? (t("adminShipping.rulesHint") as string) : m;
+  };
 
   const handleOpenAdd = () => {
     setEditingRate(null);
@@ -74,8 +80,8 @@ const ShippingManagement = () => {
       }
       await refetch();
       handleClose();
-    } catch (error: any) {
-      toast.error(error.message || "Failed to save shipping rate");
+    } catch (error: unknown) {
+      toast.error(shippingErrText(error) || (t("adminShipping.saveFailed") as string));
     } finally {
       setActionLoading(false);
     }
@@ -87,8 +93,8 @@ const ShippingManagement = () => {
       await shippingService.delete(id);
       await refetch();
       toast.success(t("adminShipping.rateDeleted") as string);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete shipping rate");
+    } catch (error: unknown) {
+      toast.error(shippingErrText(error) || (t("adminShipping.deleteFailed") as string));
     }
   };
 
@@ -97,8 +103,8 @@ const ShippingManagement = () => {
       await shippingService.update(rate.id, { isActive: !rate.isActive });
       await refetch();
       toast.success(t("adminCustomers.statusUpdated") as string);
-    } catch (error: any) {
-      toast.error("Failed to update status");
+    } catch (error: unknown) {
+      toast.error(shippingErrText(error) || (t("adminShipping.statusFailed") as string));
     }
   };
 
@@ -116,13 +122,24 @@ const ShippingManagement = () => {
         </Button>
       </div>
 
+      {error && (
+        <Alert variant="destructive" className="rounded-xl">
+          <AlertDescription className="space-y-3 text-sm leading-relaxed">
+            <p>{error === "SHIPPING_FIRESTORE_PERMISSION" ? (t("adminShipping.rulesHint") as string) : error}</p>
+            <Button variant="outline" size="sm" type="button" onClick={() => void refetch()}>
+              {t("common.retry") as string}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       ) : (
         <div>
-          {!loading && rates.length === 0 && (
+          {!loading && !error && rates.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               <p>{t("adminShipping.noRates") as string}</p>
             </div>

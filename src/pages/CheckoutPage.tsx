@@ -11,9 +11,11 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { INSTAPAY_ADDRESS, WALLET_PHONE_EN } from "@/lib/paymentWallet";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   const { items, cartTotal, clearCart } = useCartContext();
   const { user, profile } = useAuth();
   const { rates } = useShippingRates();
@@ -34,59 +36,59 @@ const CheckoutPage = () => {
   const [receiptImage, setReceiptImage] = useState("");
   const [uploadingReceipt, setUploadingReceipt] = useState(false);
 
+  const currency = (t("currency") as string) || "EGP";
+
   useEffect(() => {
     if (items.length === 0) {
-      navigate('/cart');
+      navigate("/cart");
     }
   }, [items, navigate]);
 
   useEffect(() => {
     if (profile) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         name: profile.name || "",
         phone: profile.phone || "",
-        email: user?.email && !user.email.includes('@shop-vibe.local') ? user.email : "",
+        email: user?.email && !user.email.includes("@shop-vibe.local") ? user.email : "",
       }));
       if (profile.governorate) {
         setSelectedGov(profile.governorate);
-        // default to shipping if they have a governorate maybe?
         setDeliveryMethod("shipping");
       }
     }
   }, [profile, user]);
 
-  const shippingRate = deliveryMethod === "shipping" && selectedGov
-    ? rates.find(r => r.name === selectedGov)?.rate || 0
-    : 0;
+  const shippingRate =
+    deliveryMethod === "shipping" && selectedGov ? rates.find((r) => r.name === selectedGov)?.rate || 0 : 0;
 
   const total = cartTotal + shippingRate;
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error("You must be logged in to place an order.");
+      toast.error(t("checkout.loginRequired") as string);
       return;
     }
 
     if (deliveryMethod === "shipping" && !selectedGov) {
-      toast.error("Please select a governorate for shipping.");
+      toast.error(t("checkout.selectGovError") as string);
       return;
     }
 
     if (!receiptImage) {
-      toast.error("You MUST upload the payment receipt before checking out.");
+      toast.error(t("checkout.receiptRequired") as string);
       return;
     }
 
     if (!formData.nationalId || formData.nationalId.length < 14) {
-      toast.error("Please enter a valid National ID (14 digits).");
+      toast.error(t("checkout.nationalIdError") as string);
       return;
     }
 
     try {
       setLoading(true);
-      
+
       const orderData = {
         customerId: user.uid,
         customerName: formData.name,
@@ -94,7 +96,7 @@ const CheckoutPage = () => {
         email: formData.email,
         altPhone: formData.altPhone,
         nationalId: formData.nationalId,
-        items: items.map(item => ({
+        items: items.map((item) => ({
           productId: item.id,
           name: item.name,
           price: item.price,
@@ -115,10 +117,11 @@ const CheckoutPage = () => {
 
       const orderId = await createOrder(orderData);
       clearCart();
-      toast.success("Order placed successfully!");
+      toast.success(t("checkout.orderSuccess") as string);
       navigate(`/invoice/${orderId}`);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to place order.");
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      toast.error(msg || (t("checkout.orderFailed") as string));
     } finally {
       setLoading(false);
     }
@@ -130,12 +133,13 @@ const CheckoutPage = () => {
 
     try {
       setUploadingReceipt(true);
-      const toastId = toast.loading("Uploading receipt image...");
+      const toastId = toast.loading(t("checkout.uploadingReceipt") as string);
       const secureUrl = await uploadToCloudinary(file);
       setReceiptImage(secureUrl);
-      toast.success("Receipt uploaded successfully!", { id: toastId });
-    } catch (error: any) {
-      toast.error(error.message || "Failed to upload receipt image");
+      toast.success(t("checkout.receiptUploaded") as string, { id: toastId });
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      toast.error(msg || (t("checkout.uploadFailed") as string));
     } finally {
       setUploadingReceipt(false);
     }
@@ -144,66 +148,139 @@ const CheckoutPage = () => {
   if (items.length === 0) return null;
 
   return (
-    <main className="section-padding py-10 lg:py-16 bg-gray-50 dark:bg-gray-900/40 min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Checkout</h1>
-        
-        <form onSubmit={handlePlaceOrder} className="lg:flex gap-8 items-start">
+    <main className="section-padding min-h-screen bg-gray-50 py-10 dark:bg-gray-900/40 lg:py-16" dir={language === "ar" ? "rtl" : "ltr"}>
+      <div className="mx-auto max-w-6xl">
+        <h1 className="mb-8 text-3xl font-bold">{t("checkout.title") as string}</h1>
+
+        <form onSubmit={handlePlaceOrder} className="items-start gap-8 lg:flex">
           <div className="flex-1 space-y-6">
-            
-            {/* Customer Details */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-gray-950 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <ShieldCheck className="text-primary w-5 h-5" /> Customer Details
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950"
+            >
+              <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+                <ShieldCheck className="h-5 w-5 text-primary" /> {t("checkout.customerDetails") as string}
               </h2>
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Full Name <span className="text-destructive">*</span></label>
-                  <Input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Ahmed Ali" />
+                  <label className="text-sm font-medium">
+                    {t("checkout.fullName") as string} <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder={language === "ar" ? "الاسم الكامل" : "Full name"}
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Email <span className="text-muted-foreground text-xs">(Optional)</span></label>
-                  <Input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="ahmed@example.com" />
+                  <label className="text-sm font-medium">
+                    {t("checkout.email") as string}{" "}
+                    <span className="text-xs text-muted-foreground">{t("checkout.emailOptional") as string}</span>
+                  </label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="email@example.com"
+                    dir="ltr"
+                    className="text-start"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Phone Number <span className="text-destructive">*</span></label>
-                  <Input required type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="01xxxxxxxxx" />
+                  <label className="text-sm font-medium">
+                    {t("checkout.phone") as string} <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    required
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="01xxxxxxxxx"
+                    dir="ltr"
+                    className="text-start"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-sm font-medium">Alternative Phone</label>
-                  <Input type="tel" value={formData.altPhone} onChange={e => setFormData({...formData, altPhone: e.target.value})} placeholder="Optional second number" />
+                  <label className="text-sm font-medium">{t("checkout.altPhone") as string}</label>
+                  <Input
+                    type="tel"
+                    value={formData.altPhone}
+                    onChange={(e) => setFormData({ ...formData, altPhone: e.target.value })}
+                    placeholder={t("checkout.altPhonePlaceholder") as string}
+                    dir="ltr"
+                    className="text-start"
+                  />
                 </div>
                 <div className="space-y-1.5 md:col-span-2">
-                  <label className="text-sm font-medium">National ID (الرقم القومي) <span className="text-destructive">*</span></label>
-                  <Input required minLength={14} maxLength={14} value={formData.nationalId} onChange={e => setFormData({...formData, nationalId: e.target.value})} placeholder="14 digit ID number" />
+                  <label className="text-sm font-medium">
+                    {t("checkout.nationalId") as string} <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    required
+                    minLength={14}
+                    maxLength={14}
+                    value={formData.nationalId}
+                    onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
+                    placeholder={t("checkout.nationalIdPlaceholder") as string}
+                    dir="ltr"
+                    className="text-start"
+                  />
                 </div>
               </div>
             </motion.div>
 
-            {/* Delivery Method */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-white dark:bg-gray-950 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <MapPin className="text-primary w-5 h-5" /> Delivery Method
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950"
+            >
+              <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+                <MapPin className="h-5 w-5 text-primary" /> {t("checkout.deliveryMethod") as string}
               </h2>
-              <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                <label className={`relative flex flex-col p-4 border-2 rounded-xl cursor-pointer transition-all ${deliveryMethod === 'pickup' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
-                  <input type="radio" name="delivery" value="pickup" checked={deliveryMethod === 'pickup'} onChange={() => setDeliveryMethod('pickup')} className="sr-only" />
-                  <div className="flex justify-between items-center mb-2">
-                    <Store className={`w-6 h-6 ${deliveryMethod === 'pickup' ? 'text-primary' : 'text-muted-foreground'}`} />
-                    {deliveryMethod === 'pickup' && <Check className="w-5 h-5 text-primary" />}
+              <div className="mb-6 grid gap-4 sm:grid-cols-2">
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border-2 p-4 transition-all ${
+                    deliveryMethod === "pickup" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="delivery"
+                    value="pickup"
+                    checked={deliveryMethod === "pickup"}
+                    onChange={() => setDeliveryMethod("pickup")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center justify-between">
+                    <Store className={`h-6 w-6 ${deliveryMethod === "pickup" ? "text-primary" : "text-muted-foreground"}`} />
+                    {deliveryMethod === "pickup" && <Check className="h-5 w-5 text-primary" />}
                   </div>
-                  <span className="font-semibold text-lg">Store Pickup</span>
-                  <span className="text-sm text-muted-foreground">Free - Pick up from library</span>
+                  <span className="text-lg font-semibold">{t("checkout.pickupTitle") as string}</span>
+                  <span className="text-sm text-muted-foreground">{t("checkout.pickupDesc") as string}</span>
                 </label>
-                
-                <label className={`relative flex flex-col p-4 border-2 rounded-xl cursor-pointer transition-all ${deliveryMethod === 'shipping' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
-                  <input type="radio" name="delivery" value="shipping" checked={deliveryMethod === 'shipping'} onChange={() => setDeliveryMethod('shipping')} className="sr-only" />
-                  <div className="flex justify-between items-center mb-2">
-                    <Truck className={`w-6 h-6 ${deliveryMethod === 'shipping' ? 'text-primary' : 'text-muted-foreground'}`} />
-                    {deliveryMethod === 'shipping' && <Check className="w-5 h-5 text-primary" />}
+
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border-2 p-4 transition-all ${
+                    deliveryMethod === "shipping" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="delivery"
+                    value="shipping"
+                    checked={deliveryMethod === "shipping"}
+                    onChange={() => setDeliveryMethod("shipping")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center justify-between">
+                    <Truck className={`h-6 w-6 ${deliveryMethod === "shipping" ? "text-primary" : "text-muted-foreground"}`} />
+                    {deliveryMethod === "shipping" && <Check className="h-5 w-5 text-primary" />}
                   </div>
-                  <span className="font-semibold text-lg">Delivery Shipping</span>
-                  <span className="text-sm text-muted-foreground">Delivered to your address</span>
+                  <span className="text-lg font-semibold">{t("checkout.shippingTitle") as string}</span>
+                  <span className="text-sm text-muted-foreground">{t("checkout.shippingDesc") as string}</span>
                 </label>
               </div>
 
@@ -215,18 +292,24 @@ const CheckoutPage = () => {
                     exit={{ opacity: 0, height: 0, scale: 0.95 }}
                     className="overflow-hidden"
                   >
-                    <div className="p-4 bg-gray-50 dark:bg-gray-900 border border-border rounded-xl">
-                      <label className="text-sm font-medium mb-1.5 block">Select Governorate <span className="text-destructive">*</span></label>
-                      <select 
+                    <div className="rounded-xl border border-border bg-gray-50 p-4 dark:bg-gray-900">
+                      <label className="mb-1.5 block text-sm font-medium">
+                        {t("checkout.selectGovernorate") as string} <span className="text-destructive">*</span>
+                      </label>
+                      <select
                         required
-                        className="w-full h-11 px-3 rounded-lg border-2 border-primary/20 bg-background focus:border-primary focus:ring-0 outline-none transition-colors"
+                        className="h-11 w-full rounded-lg border-2 border-primary/20 bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary focus:ring-0"
                         value={selectedGov}
                         onChange={(e) => setSelectedGov(e.target.value)}
                       >
-                        <option value="">Select your Governorate</option>
-                        {rates.filter(r => r.isActive).map(rate => (
-                          <option key={rate.id} value={rate.name}>{rate.name} (+{rate.rate} EGP)</option>
-                        ))}
+                        <option value="">{t("checkout.selectGovernoratePlaceholder") as string}</option>
+                        {rates
+                          .filter((r) => r.isActive)
+                          .map((rate) => (
+                            <option key={rate.id} value={rate.name}>
+                              {rate.name} (+{rate.rate} {currency})
+                            </option>
+                          ))}
                       </select>
                     </div>
                   </motion.div>
@@ -234,73 +317,115 @@ const CheckoutPage = () => {
               </AnimatePresence>
             </motion.div>
 
-            {/* Payment & Receipt Method */}
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="bg-white dark:bg-gray-950 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm mt-6">
-              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <CreditCard className="text-primary w-5 h-5" /> Payment Method
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="mt-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950"
+            >
+              <h2 className="mb-4 flex items-center gap-2 text-xl font-bold">
+                <CreditCard className="h-5 w-5 text-primary" /> {t("checkout.paymentMethod") as string}
               </h2>
-              <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                <label className={`relative flex flex-col p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'vodafone' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
-                  <input type="radio" name="paymentMethod" value="vodafone" checked={paymentMethod === 'vodafone'} onChange={() => setPaymentMethod('vodafone')} className="sr-only" />
-                  <div className="flex justify-between items-center mb-2">
-                    <Smartphone className={`w-6 h-6 ${paymentMethod === 'vodafone' ? 'text-rose-600' : 'text-muted-foreground'}`} />
-                    {paymentMethod === 'vodafone' && <Check className="w-5 h-5 text-primary" />}
+              <div className="mb-6 grid gap-4 sm:grid-cols-2">
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border-2 p-4 transition-all ${
+                    paymentMethod === "vodafone" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="vodafone"
+                    checked={paymentMethod === "vodafone"}
+                    onChange={() => setPaymentMethod("vodafone")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center justify-between">
+                    <Smartphone className={`h-6 w-6 ${paymentMethod === "vodafone" ? "text-rose-600" : "text-muted-foreground"}`} />
+                    {paymentMethod === "vodafone" && <Check className="h-5 w-5 text-primary" />}
                   </div>
-                  <span className="font-semibold text-lg text-rose-600">Vodafone Cash</span>
-                  <span className="text-sm text-muted-foreground">Transfer to {WALLET_PHONE_EN}</span>
+                  <span className="text-lg font-semibold text-rose-600">{t("checkout.vodafoneCash") as string}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {t("checkout.transferTo") as string} {WALLET_PHONE_EN}
+                  </span>
                 </label>
-                
-                <label className={`relative flex flex-col p-4 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === 'instapay' ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'}`}>
-                  <input type="radio" name="paymentMethod" value="instapay" checked={paymentMethod === 'instapay'} onChange={() => setPaymentMethod('instapay')} className="sr-only" />
-                  <div className="flex justify-between items-center mb-2">
-                    <Smartphone className={`w-6 h-6 ${paymentMethod === 'instapay' ? 'text-indigo-600' : 'text-muted-foreground'}`} />
-                    {paymentMethod === 'instapay' && <Check className="w-5 h-5 text-primary" />}
+
+                <label
+                  className={`relative flex cursor-pointer flex-col rounded-xl border-2 p-4 transition-all ${
+                    paymentMethod === "instapay" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="instapay"
+                    checked={paymentMethod === "instapay"}
+                    onChange={() => setPaymentMethod("instapay")}
+                    className="sr-only"
+                  />
+                  <div className="mb-2 flex items-center justify-between">
+                    <Smartphone className={`h-6 w-6 ${paymentMethod === "instapay" ? "text-indigo-600" : "text-muted-foreground"}`} />
+                    {paymentMethod === "instapay" && <Check className="h-5 w-5 text-primary" />}
                   </div>
-                  <span className="font-semibold text-lg text-indigo-600">InstaPay</span>
-                  <span className="text-sm text-muted-foreground">InstaPay: {INSTAPAY_ADDRESS}</span>
+                  <span className="text-lg font-semibold text-indigo-600">{t("checkout.instapay") as string}</span>
+                  <span className="break-all text-sm text-muted-foreground" dir="ltr">
+                    {INSTAPAY_ADDRESS}
+                  </span>
                 </label>
               </div>
 
-              {/* Instructions & Upload */}
-              <div className="bg-gray-50 dark:bg-gray-900 border border-border rounded-xl p-5 mt-4">
-                <p className="text-sm font-semibold mb-2">
-                  1. Please transfer <span className="text-primary font-bold text-lg">{total.toFixed(2)} EGP</span> to the selected method:
+              <div className="mt-4 rounded-xl border border-border bg-gray-50 p-5 dark:bg-gray-900">
+                <p className="mb-2 text-sm font-semibold">
+                  {t("checkout.stepTransfer") as string}{" "}
+                  <span className="text-lg font-bold text-primary" dir="ltr">
+                    {total.toFixed(2)} {currency}
+                  </span>
                 </p>
-                <div className="flex items-center gap-3 p-3 bg-white border border-border shadow-sm rounded-lg mb-4">
-                  <span className="font-mono text-xl tracking-widest text-slate-800 font-black flex-1 text-center">
+                <div className="mb-4 flex items-center gap-3 rounded-lg border border-border bg-white p-3 shadow-sm">
+                  <span className="flex-1 text-center font-mono text-xl font-black tracking-widest text-slate-800" dir="ltr">
                     {paymentMethod === "vodafone" ? WALLET_PHONE_EN : INSTAPAY_ADDRESS}
                   </span>
-                  <Button variant="outline" size="sm" type="button" onClick={() => {
-                    navigator.clipboard.writeText(paymentMethod === "vodafone" ? WALLET_PHONE_EN : INSTAPAY_ADDRESS);
-                    toast.success("Copied to clipboard!");
-                  }}>
-                     <Copy className="w-4 h-4" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(paymentMethod === "vodafone" ? WALLET_PHONE_EN : INSTAPAY_ADDRESS);
+                      toast.success(t("checkout.copied") as string);
+                    }}
+                  >
+                    <Copy className="h-4 w-4" />
+                    <span className="ms-1 hidden sm:inline">{t("checkout.copy") as string}</span>
                   </Button>
                 </div>
 
-                <p className="text-sm font-semibold mb-2 mt-4 text-rose-600">
-                  2. Upload Payment Receipt / Screenshot <span className="text-destructive">*</span>
+                <p className="mb-2 mt-4 text-sm font-semibold text-rose-600">
+                  {t("checkout.stepUpload") as string} <span className="text-destructive">*</span>
                 </p>
-                <div className="flex gap-2 items-center">
-                   <Input 
-                     type="file" 
-                     accept="image/*"
-                     onChange={handleReceiptUpload}
-                     className="flex-1 cursor-pointer bg-white"
-                     disabled={uploadingReceipt}
-                     required={!receiptImage} 
-                   />
-                   {uploadingReceipt && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground shrink-0" />}
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleReceiptUpload}
+                    className="flex-1 cursor-pointer bg-white"
+                    disabled={uploadingReceipt}
+                    required={!receiptImage}
+                  />
+                  {uploadingReceipt && <Loader2 className="h-5 w-5 shrink-0 animate-spin text-muted-foreground" />}
                 </div>
                 {receiptImage && (
-                  <div className="relative inline-block mt-4">
-                    <img src={receiptImage} alt="Receipt Preview" className="w-auto h-auto max-h-56 object-contain rounded-xl border-2 border-primary/20 shadow-md bg-white" />
-                    <button 
-                      type="button" 
+                  <div className="relative mt-4 inline-block">
+                    <img
+                      src={receiptImage}
+                      alt={t("checkout.receiptPreview") as string}
+                      className="h-auto max-h-56 w-auto rounded-xl border-2 border-primary/20 bg-white object-contain shadow-md"
+                    />
+                    <button
+                      type="button"
                       onClick={() => setReceiptImage("")}
-                      className="absolute -top-2 -right-2 bg-rose-500 hover:bg-rose-600 text-white rounded-full p-1.5 shadow-md transition-colors"
+                      className="absolute -end-2 -top-2 rounded-full bg-rose-500 p-1.5 text-white shadow-md transition-colors hover:bg-rose-600"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
                 )}
@@ -308,45 +433,71 @@ const CheckoutPage = () => {
             </motion.div>
           </div>
 
-          {/* Order Summary */}
-          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="lg:w-96 mt-8 lg:mt-0 sticky top-24">
-            <div className="bg-white dark:bg-gray-950 p-6 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm">
-              <h3 className="font-bold text-lg mb-4">Order Summary</h3>
-              
-              <div className="space-y-4 mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-8 lg:sticky lg:top-24 lg:mt-0 lg:w-96"
+          >
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-950">
+              <h3 className="mb-4 text-lg font-bold">{t("checkout.orderSummary") as string}</h3>
+
+              <div className="mb-6 space-y-4">
                 {items.map((item, i) => (
                   <div key={i} className="flex gap-3 text-sm">
-                    <img src={item.image} alt={item.name} className="w-12 h-12 rounded object-cover flex-shrink-0 border" />
-                    <div className="flex-1">
-                      <p className="font-medium line-clamp-1">{item.name}</p>
-                      <p className="text-muted-foreground">Qty: {item.quantity}</p>
+                    <img src={item.image} alt={item.name} className="h-12 w-12 shrink-0 rounded object-cover border" />
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-1 font-medium">{item.name}</p>
+                      <p className="text-muted-foreground">
+                        {t("checkout.qty") as string}: {item.quantity}
+                      </p>
                     </div>
-                    <p className="font-semibold">{(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="shrink-0 font-semibold" dir="ltr">
+                      {(item.price * item.quantity).toFixed(2)}
+                    </p>
                   </div>
                 ))}
               </div>
 
-              <div className="space-y-3 pt-4 border-t border-border text-sm">
+              <div className="space-y-3 border-t border-border pt-4 text-sm">
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Subtotal</span>
-                  <span>{cartTotal.toFixed(2)} EGP</span>
+                  <span>{t("checkout.subtotal") as string}</span>
+                  <span dir="ltr">
+                    {cartTotal.toFixed(2)} {currency}
+                  </span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Shipping</span>
-                  <span>{deliveryMethod === 'pickup' ? 'Free (Pickup)' : (shippingRate ? `${shippingRate.toFixed(2)} EGP` : 'Select Governorate')}</span>
+                  <span>{t("checkout.shipping") as string}</span>
+                  <span dir="ltr">
+                    {deliveryMethod === "pickup"
+                      ? (t("checkout.shippingFreePickup") as string)
+                      : shippingRate
+                        ? `${shippingRate.toFixed(2)} ${currency}`
+                        : (t("checkout.shippingSelectGov") as string)}
+                  </span>
                 </div>
-                <div className="pt-3 flex justify-between font-bold text-lg text-primary border-t border-border">
-                  <span>Total</span>
-                  <span>{total.toFixed(2)} EGP</span>
+                <div className="flex justify-between border-t border-border pt-3 text-lg font-bold text-primary">
+                  <span>{t("checkout.total") as string}</span>
+                  <span dir="ltr">
+                    {total.toFixed(2)} {currency}
+                  </span>
                 </div>
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full mt-6 py-6 text-base rounded-xl font-bold gap-2">
-                {loading ? <><Loader2 className="w-5 h-5 animate-spin"/> Processing...</> : <>Place Order <ArrowRight className="w-5 h-5" /></>}
+              <Button type="submit" disabled={loading} className="mt-6 w-full gap-2 rounded-xl py-6 text-base font-bold">
+                {loading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" /> {t("checkout.processing") as string}
+                  </>
+                ) : (
+                  <>
+                    {t("checkout.placeOrder") as string}{" "}
+                    <ArrowRight className={`h-5 w-5 ${language === "ar" ? "rotate-180" : ""}`} />
+                  </>
+                )}
               </Button>
             </div>
           </motion.div>
-
         </form>
       </div>
     </main>

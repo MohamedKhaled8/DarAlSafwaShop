@@ -11,14 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { resolveCategoryName } from "@/lib/localizedContent";
 import ProductCard from "@/components/ProductCard";
 import { useProducts, useCategories } from "@/hooks/useProducts";
-
-const HERO_IMAGES = [
-  "https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?w=1920&q=80&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1920&q=80&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1521587760476-4c4a0b0af8b4?w=1920&q=80&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=1920&q=80&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1524995997946-a1c30390a16a?w=1920&q=80&auto=format&fit=crop",
-];
+import { HERO_IMAGE_PATHS } from "@/data/heroImages";
 
 /* ═══════ MARKETPLACE HERO ═══════ */
 const HERO_CROSSFADE_MS = 2200;
@@ -36,6 +29,13 @@ const DarAlSafwaHero = () => {
   const commitTimerRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
+    HERO_IMAGE_PATHS.forEach((src) => {
+      const im = new Image();
+      im.src = src;
+    });
+  }, []);
+
+  useEffect(() => {
     const runCycle = () => {
       if (commitTimerRef.current) window.clearTimeout(commitTimerRef.current);
       setCutTransition(false);
@@ -45,7 +45,7 @@ const DarAlSafwaHero = () => {
       commitTimerRef.current = window.setTimeout(() => {
         setCutTransition(true);
         setOverlayVisible(false);
-        setBaseIndex((i) => (i + 1) % HERO_IMAGES.length);
+        setBaseIndex((i) => (i + 1) % HERO_IMAGE_PATHS.length);
         requestAnimationFrame(() => setCutTransition(false));
       }, HERO_CROSSFADE_MS);
     };
@@ -57,8 +57,8 @@ const DarAlSafwaHero = () => {
     };
   }, []);
 
-  const bottomSrc = HERO_IMAGES[baseIndex];
-  const topSrc = HERO_IMAGES[(baseIndex + 1) % HERO_IMAGES.length];
+  const bottomSrc = HERO_IMAGE_PATHS[baseIndex];
+  const topSrc = HERO_IMAGE_PATHS[(baseIndex + 1) % HERO_IMAGE_PATHS.length];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,8 +114,8 @@ const DarAlSafwaHero = () => {
 
         <div className="absolute -bottom-8 left-0 right-0 z-30 px-6">
           <form onSubmit={handleSearch} className="max-w-4xl mx-auto">
-            <div className="flex flex-row-reverse items-center bg-white shadow-[0_20px_40px_rgba(0,0,0,0.15)] overflow-hidden transition-all duration-300 ring-1 ring-black/5 rounded-none">
-              <button type="submit" className="bg-slate-900 hover:bg-violet-600 text-white p-5 md:p-6 transition-all shrink-0 rounded-none">
+            <div className="flex flex-row-reverse items-center overflow-hidden rounded-2xl bg-white shadow-[0_20px_40px_rgba(0,0,0,0.15)] ring-1 ring-black/5 transition-all duration-300">
+              <button type="submit" className="shrink-0 bg-slate-900 p-5 text-white transition-all hover:bg-violet-600 md:p-6">
                 <Search className="w-7 h-7 md:w-9 md:h-9" />
               </button>
               <input

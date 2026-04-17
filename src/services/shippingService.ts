@@ -1,15 +1,23 @@
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
+import { FirebaseError } from "firebase/app";
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
   query,
-  orderBy
-} from 'firebase/firestore';
-import { db } from './firebase';
+  orderBy,
+} from "firebase/firestore";
+import { db } from "./firebase";
+
+function mapShippingError(err: unknown): never {
+  if (err instanceof FirebaseError && err.code === "permission-denied") {
+    throw new Error("SHIPPING_FIRESTORE_PERMISSION");
+  }
+  throw err as Error;
+}
 
 export interface ShippingRate {
   id: string;
@@ -32,8 +40,8 @@ export const shippingService = {
         ...doc.data()
       } as ShippingRate));
     } catch (error) {
-      console.error('Error fetching shipping rates:', error);
-      throw error;
+      console.error("Error fetching shipping rates:", error);
+      mapShippingError(error);
     }
   },
 
@@ -57,8 +65,8 @@ export const shippingService = {
         ...rate
       };
     } catch (error) {
-      console.error('Error adding shipping rate:', error);
-      throw error;
+      console.error("Error adding shipping rate:", error);
+      mapShippingError(error);
     }
   },
 
@@ -68,8 +76,8 @@ export const shippingService = {
       const docRef = doc(db, COLLECTION_NAME, id);
       await updateDoc(docRef, rateData);
     } catch (error) {
-      console.error('Error updating shipping rate:', error);
-      throw error;
+      console.error("Error updating shipping rate:", error);
+      mapShippingError(error);
     }
   },
 
@@ -79,8 +87,8 @@ export const shippingService = {
       const docRef = doc(db, COLLECTION_NAME, id);
       await deleteDoc(docRef);
     } catch (error) {
-      console.error('Error deleting shipping rate:', error);
-      throw error;
+      console.error("Error deleting shipping rate:", error);
+      mapShippingError(error);
     }
   }
 };
