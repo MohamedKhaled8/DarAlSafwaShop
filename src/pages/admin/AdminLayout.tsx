@@ -37,9 +37,6 @@ const AdminLayout = () => {
       <Link to="/admin/analytics" className={linkClass("/admin/analytics")} onClick={onNavigate}>
         {t("admin.analytics") as string}
       </Link>
-      <Link to="/admin/printing" className={linkClass("/admin/printing")} onClick={onNavigate}>
-        {t("admin.printingSetup") as string}
-      </Link>
       <Link to="/admin/gifts" className={linkClass("/admin/gifts")} onClick={onNavigate}>
         {t("admin.giftsSetup") as string}
       </Link>

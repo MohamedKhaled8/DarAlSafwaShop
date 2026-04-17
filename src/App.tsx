@@ -29,7 +29,6 @@ import OrdersManagement from "@/pages/admin/OrdersManagement";
 import CustomersPage from "@/pages/admin/CustomersPage";
 import CategoriesManagement from "@/pages/admin/CategoriesManagement";
 import AnalyticsPage from "@/pages/admin/AnalyticsPage";
-import AdminPrintingPage from "@/pages/admin/AdminPrintingPage";
 import AdminGiftsPage from "@/pages/admin/AdminGiftsPage";
 import SettingsPage from "@/pages/admin/SettingsPage";
 import SeedDataPage from "@/pages/admin/SeedDataPage";
@@ -74,7 +73,6 @@ const App = () => (
                 <Route path="customers" element={<CustomersPage />} />
                 <Route path="categories" element={<CategoriesManagement />} />
                 <Route path="analytics" element={<AnalyticsPage />} />
-                <Route path="printing" element={<AdminPrintingPage />} />
                 <Route path="gifts" element={<AdminGiftsPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="shipping" element={<ShippingManagement />} />

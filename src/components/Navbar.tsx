@@ -111,7 +111,8 @@ const Navbar = () => {
     try {
       await logout();
       setUserOpen(false);
-      navigate("/");
+      setMenuOpen(false);
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Logout failed:", error);
     }
