@@ -243,7 +243,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "checkout.receiptUploaded": "تم رفع الإيصال.",
     "checkout.uploadFailed": "فشل رفع الإيصال.",
     "checkout.receiptPreview": "معاينة الإيصال",
-    "adminShipping.rulesHint": "صلاحيات Firestore: أضف مجموعة shippingRates في قواعد الأمان أو انشر ملف firestore.rules من المشروع (راجع firebase.json).",
+    "adminShipping.rulesHint": "استضافة Cloudflare للموقع لا تنشر قواعد Firestore — القواعد على مشروع Firebase فقط. افتح console.firebase.com → نفس المشروع المستخدم في إعدادات التطبيق (VITE_FIREBASE_PROJECT_ID) → Firestore Database → Rules → انسخ محتوى ملف firestore.rules من المستودع (تأكد من وجود match /shippingRates/) ثم Publish. أو من جهازك بعد تثبيت CLI وتسجيل الدخول: npx firebase-tools login ثم npx firebase-tools use <معرف_المشروع> ثم npm run deploy:firestore-rules",
     
     // Category page
     "category.adjustFilters": "حاول تعديل الفلاتر",
@@ -843,7 +843,7 @@ const translations: Record<Language, Record<string, string | Record<string, stri
     "checkout.receiptUploaded": "Receipt uploaded.",
     "checkout.uploadFailed": "Failed to upload receipt.",
     "checkout.receiptPreview": "Receipt preview",
-    "adminShipping.rulesHint": "Firestore permissions: add a shippingRates rule or deploy firestore.rules from this repo (see firebase.json).",
+    "adminShipping.rulesHint": "Cloudflare only hosts the frontend — Firestore security rules live on Firebase. Open console.firebase.com → the same project as VITE_FIREBASE_PROJECT_ID → Firestore Database → Rules → paste your repo’s firestore.rules (must include match /shippingRates/) → Publish. Or from your machine: npx firebase-tools login, npx firebase-tools use <project_id>, then npm run deploy:firestore-rules",
     
     // Category page
     "category.adjustFilters": "Try adjusting your filters",

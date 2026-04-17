@@ -1,46 +1,52 @@
 rules_version = '2';
+// انشر هذا الملف من Firebase Console → Firestore → Rules → Publish
+// أو: npm run deploy:firestore-rules (بعد firebase login و firebase use <projectId>)
+// ملاحظة: رفع الموقع على Cloudflare لا ينشر هذه القواعد — لازم خطوة Firebase فقط.
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
+
+    // Users collection - keep restricted
+    match /users/{userId} {
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow read, update: if request.auth != null && request.auth.uid == userId;
     }
 
-    match /products/{docId} {
+    // Products - allow public read (for visitors)
+    match /products/{productId} {
       allow read: if true;
-      allow create, update, delete: if signedIn();
+      allow write: if request.auth != null;
     }
 
-    match /categories/{docId} {
+    // Categories - allow public read
+    match /categories/{categoryId} {
       allow read: if true;
-      allow create, update, delete: if signedIn();
+      allow write: if request.auth != null;
     }
 
+    // Orders - require auth (same as your rules)
+    match /orders/{orderId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // أسعار الشحن — الزوار يقرأونها (الدفع/الشحن)، الأدمن يعدّل وهو مسجّل
     match /shippingRates/{docId} {
       allow read: if true;
-      allow create, update, delete: if signedIn();
+      allow create, update, delete: if request.auth != null;
     }
 
+    // إعدادات أسعار الطباعة — الصفحة العامة تقرأ، الأدمن يكتب
     match /printPricing/{docId} {
       allow read: if true;
-      allow create, update, delete: if signedIn();
+      allow create, update, delete: if request.auth != null;
     }
 
-    match /orders/{docId} {
-      allow read: if true;
-      allow create: if signedIn() && request.resource.data.customerId == request.auth.uid;
-      allow update, delete: if signedIn();
-    }
-
-    match /users/{docId} {
-      allow read, write: if signedIn();
-    }
-
+    // طلبات الطباعة والهدايا (يستخدمها الأدمن والمستخدم المسجّل في التطبيق)
     match /printOrders/{docId} {
-      allow read, write: if signedIn();
+      allow read, write: if request.auth != null;
     }
 
     match /giftOrders/{docId} {
-      allow read, write: if signedIn();
+      allow read, write: if request.auth != null;
     }
   }
 }
