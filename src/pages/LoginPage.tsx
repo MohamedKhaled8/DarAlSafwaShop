@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2, Mail, Eye, EyeOff, LogIn } from "lucide-react";
 import { toast } from "sonner";
@@ -10,6 +10,7 @@ import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 const LoginPage = () => {
   const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -53,11 +54,13 @@ const LoginPage = () => {
       toast.success((t("login.welcomeBack") as string) || (isRTL ? "تم تسجيل الدخول بنجاح!" : "Signed in successfully!"));
       
       // Delay navigation slightly so AuthContext can finish its state updates properly
+      const redirect = searchParams.get("redirect");
+      const safeRedirect = redirect && redirect.startsWith("/") ? redirect : null;
       setTimeout(() => {
         if (isAdminUser) {
           navigate("/admin");
         } else {
-          navigate("/");
+          navigate(safeRedirect || "/");
         }
       }, 500);
     } catch (error: any) {

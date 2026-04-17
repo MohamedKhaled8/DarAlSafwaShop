@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, CheckCircle2, Eye, EyeOff, MapPin, Phone, User, Mail, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -39,6 +39,7 @@ const GOVERNORATES = [
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t, isRTL } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -110,8 +111,10 @@ const RegisterPage = () => {
       setSuccess(true);
       toast.success(t("register.success") as string || "تم إنشاء الحساب بنجاح");
 
+      const redirect = searchParams.get("redirect");
+      const safeRedirect = redirect && redirect.startsWith("/") ? redirect : "/";
       setTimeout(() => {
-        navigate("/");
+        navigate(safeRedirect);
       }, 2000);
     } catch (error: any) {
       toast.error(error.message);

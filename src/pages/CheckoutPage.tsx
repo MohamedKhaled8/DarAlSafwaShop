@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { INSTAPAY_ADDRESS, WALLET_PHONE_EN } from "@/lib/paymentWallet";
 import { useLanguage } from "@/contexts/LanguageContext";
+import CheckoutAuthDialog from "@/components/CheckoutAuthDialog";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const CheckoutPage = () => {
   const { rates } = useShippingRates();
 
   const [loading, setLoading] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -67,7 +69,7 @@ const CheckoutPage = () => {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      toast.error(t("checkout.loginRequired") as string);
+      setShowAuthDialog(true);
       return;
     }
 
@@ -381,8 +383,11 @@ const CheckoutPage = () => {
                     {total.toFixed(2)} {currency}
                   </span>
                 </p>
-                <div className="mb-4 flex items-center gap-3 rounded-lg border border-border bg-white p-3 shadow-sm">
-                  <span className="flex-1 text-center font-mono text-xl font-black tracking-widest text-slate-800" dir="ltr">
+                <div className="mb-4 flex items-center gap-3 rounded-lg border border-border bg-white p-3 shadow-sm dark:bg-gray-950">
+                  <span
+                    className="flex-1 text-center font-mono text-xl font-black tracking-widest text-slate-800 dark:text-slate-100"
+                    dir="ltr"
+                  >
                     {paymentMethod === "vodafone" ? WALLET_PHONE_EN : INSTAPAY_ADDRESS}
                   </span>
                   <Button
@@ -399,26 +404,30 @@ const CheckoutPage = () => {
                   </Button>
                 </div>
 
-                <p className="mb-2 mt-4 text-sm font-semibold text-rose-600">
-                  {t("checkout.stepUpload") as string} <span className="text-destructive">*</span>
-                </p>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleReceiptUpload}
-                    className="flex-1 cursor-pointer bg-white"
-                    disabled={uploadingReceipt}
-                    required={!receiptImage}
-                  />
-                  {uploadingReceipt && <Loader2 className="h-5 w-5 shrink-0 animate-spin text-muted-foreground" />}
-                </div>
+                {!receiptImage && (
+                  <>
+                    <p className="mb-2 mt-4 text-sm font-semibold text-rose-600 dark:text-rose-400">
+                      {t("checkout.stepUpload") as string} <span className="text-destructive">*</span>
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleReceiptUpload}
+                        className="flex-1 cursor-pointer bg-white text-slate-900 file:text-slate-900 dark:bg-gray-950 dark:text-slate-100 dark:file:text-slate-100"
+                        disabled={uploadingReceipt}
+                        required
+                      />
+                      {uploadingReceipt && <Loader2 className="h-5 w-5 shrink-0 animate-spin text-muted-foreground" />}
+                    </div>
+                  </>
+                )}
                 {receiptImage && (
                   <div className="relative mt-4 inline-block">
                     <img
                       src={receiptImage}
                       alt={t("checkout.receiptPreview") as string}
-                      className="h-auto max-h-56 w-auto rounded-xl border-2 border-primary/20 bg-white object-contain shadow-md"
+                      className="h-auto max-h-56 w-auto rounded-xl border-2 border-primary/20 bg-white object-contain shadow-md dark:bg-gray-950"
                     />
                     <button
                       type="button"
@@ -500,6 +509,7 @@ const CheckoutPage = () => {
           </motion.div>
         </form>
       </div>
+      <CheckoutAuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} redirectTo="/checkout" />
     </main>
   );
 };

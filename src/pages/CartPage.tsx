@@ -5,20 +5,20 @@ import { Trash2, Minus, Plus, ShoppingBag, ArrowRight } from "lucide-react";
 import { useCartContext } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import QuickRegistrationModal from "@/components/QuickRegistrationModal";
+import CheckoutAuthDialog from "@/components/CheckoutAuthDialog";
 
 const CartPage = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { items, removeFromCart, updateQuantity, cartTotal, clearCart } = useCartContext();
-  const [showQuickRegister, setShowQuickRegister] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const handleCheckoutClick = () => {
     if (user) {
       navigate('/checkout');
     } else {
-      setShowQuickRegister(true);
+      setShowAuthDialog(true);
     }
   };
 
@@ -113,13 +113,10 @@ const CartPage = () => {
         </div>
       </div>
 
-      <QuickRegistrationModal 
-        isOpen={showQuickRegister} 
-        onClose={() => setShowQuickRegister(false)} 
-        onSuccess={() => {
-          setShowQuickRegister(false);
-          navigate('/checkout');
-        }} 
+      <CheckoutAuthDialog
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+        redirectTo="/checkout"
       />
     </main>
   );
